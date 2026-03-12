@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -386,6 +387,8 @@ async function loadData(){
       wethr('nws_forecasts.php', {station_code: station.code, date: today, mode: 'history'}).catch(e => { console.warn('FAIL history:', e.message); return null; }),
     ]);
 
+    console.log('RAW latestObs:', JSON.stringify(latestObs));
+    console.log('RAW wuHigh:', JSON.stringify(wuHigh));
     console.log('DATA:', { liveHigh: !!liveHigh, latestObs: !!latestObs, obs1min: !!obs1min, dewPt: latestObs&&latestObs.dew_point, windSpd: latestObs&&latestObs.wind_speed, todayFcst: !!todayFcst, tomorrowFcst: !!tomorrowFcst });
 
     // \u2500\u2500 LIVE HIGH \u2500\u2500
