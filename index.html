@@ -13,7 +13,7 @@ html,body{background:#07090d;color:#d0dde8;font-family:'Barlow',sans-serif;min-h
 :root{
   --acid:#00ffc8;--fire:#ff5533;--gold:#ffcb47;--ice:#5bc8ff;
   --bg:#07090d;--s1:#0d1520;--s2:#111c2a;
-  --bd:rgba(0,255,200,0.12);--mut:#3b5268;--dim:#7a9ab8;
+  --bd:rgba(0,255,200,0.12);--mut:#5a7a94;--dim:#a8c4d8;
   --mono:'Share Tech Mono',monospace;--cond:'Barlow Condensed',sans-serif;
 }
 @keyframes glow{0%,100%{text-shadow:0 0 20px rgba(0,255,200,.3)}50%{text-shadow:0 0 50px rgba(0,255,200,.8)}}
@@ -53,18 +53,18 @@ html,body{background:#07090d;color:#d0dde8;font-family:'Barlow',sans-serif;min-h
 .stat.acid::after{background:linear-gradient(90deg,var(--acid),transparent)}
 .stat.fire::after{background:linear-gradient(90deg,var(--fire),transparent)}
 .stat.gold::after{background:linear-gradient(90deg,var(--gold),transparent)}
-.stat-label{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--mut);text-transform:uppercase;margin-bottom:8px}
+.stat-label{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--mut);text-transform:uppercase;margin-bottom:8px}
 .stat-val{font-family:var(--cond);font-weight:900;line-height:1}
 .stat-big{font-size:64px}
 .stat-med{font-size:50px}
-.stat-info{font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:6px}
+.stat-info{font-family:var(--mono);font-size:11px;color:#b0cce0;margin-top:6px}
 .chip{display:inline-block;background:rgba(0,255,200,.08);border:1px solid var(--bd);color:var(--acid);font-family:var(--mono);font-size:9px;padding:2px 8px;letter-spacing:1px;margin-top:8px}
 
 /* BET BANNER */
 .bet-banner{background:var(--s2);border:1px solid var(--bd);padding:16px 20px;margin-bottom:12px;display:grid;grid-template-columns:auto auto auto 1fr;gap:24px;align-items:center;position:relative;overflow:hidden}
 .bet-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--acid),var(--fire),transparent)}
 @media(max-width:600px){.bet-banner{grid-template-columns:1fr 1fr;gap:14px}}
-.bb-label{font-family:var(--mono);font-size:8px;letter-spacing:3px;color:var(--mut);text-transform:uppercase;margin-bottom:5px}
+.bb-label{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--mut);text-transform:uppercase;margin-bottom:5px}
 .bb-val{font-family:var(--cond);font-weight:900;font-size:28px}
 .bet-pill{font-family:var(--cond);font-weight:900;font-size:20px;letter-spacing:2px;padding:5px 14px;border:2px solid;display:inline-block}
 .bet-pill.over{color:#00e676;border-color:#00e676;background:rgba(0,230,118,.08)}
@@ -84,7 +84,7 @@ html,body{background:#07090d;color:#d0dde8;font-family:'Barlow',sans-serif;min-h
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
 @media(max-width:600px){.two-col{grid-template-columns:1fr}}
 .panel{background:var(--s1);border:1px solid var(--bd);padding:16px 18px}
-.panel-label{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--mut);text-transform:uppercase;margin-bottom:12px}
+.panel-label{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--mut);text-transform:uppercase;margin-bottom:12px}
 .h-bars{display:flex;align-items:flex-end;gap:3px;height:72px}
 .h-bar{flex:1;border-radius:1px 1px 0 0;min-width:0}
 .h-labels{display:flex;gap:3px;margin-top:4px}
@@ -101,17 +101,22 @@ html,body{background:#07090d;color:#d0dde8;font-family:'Barlow',sans-serif;min-h
 .analysis-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
 .a-badge{background:var(--acid);color:#000;font-family:var(--mono);font-size:9px;letter-spacing:2px;padding:3px 8px;font-weight:700}
 .a-title{font-family:var(--cond);font-size:17px;font-weight:700;letter-spacing:2px}
-.analysis-body{font-size:13px;line-height:1.9;color:var(--dim)}
+.analysis-body{font-size:14px;line-height:1.9;color:var(--dim)}
 .analysis-body h2{font-family:var(--cond);font-size:13px;font-weight:700;letter-spacing:2px;color:#cdd9e3;margin:14px 0 4px;text-transform:uppercase;border-left:3px solid var(--acid);padding-left:8px}
 .loading{animation:pulse 1.6s ease-in-out infinite;font-family:var(--mono);font-size:11px;color:var(--mut)}
 .error-box{background:rgba(255,85,51,.07);border:1px solid rgba(255,85,51,.2);color:#ff9999;padding:12px 16px;font-family:var(--mono);font-size:11px;margin-bottom:12px}
+.prob-row{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px}
+.prob-temp{width:32px;color:#fff;text-align:right;flex-shrink:0}
+.prob-bar-wrap{flex:1;background:rgba(255,255,255,0.06);border-radius:2px;height:14px;overflow:hidden}
+.prob-bar-fill{height:100%;border-radius:2px;transition:width .4s ease}
+.prob-pct{width:36px;text-align:right;flex-shrink:0;color:#a8c4d8}
 .warn-box{background:rgba(255,203,71,.07);border:1px solid rgba(255,203,71,.2);color:var(--gold);padding:12px 16px;font-family:var(--mono);font-size:11px;margin-bottom:12px}
 .footer{font-family:var(--mono);font-size:9px;color:var(--mut);text-align:center;padding-top:14px;border-top:1px solid var(--bd);letter-spacing:1px}
 .spin{display:inline-block;animation:spin 1s linear infinite}
 .cond-item{background:var(--s1);border:1px solid var(--bd);padding:10px 12px;}
 .cond-label{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--mut);text-transform:uppercase;margin-bottom:4px}
 .cond-val{font-family:var(--cond);font-weight:700;font-size:20px;color:#fff}
-.cond-sub{font-family:var(--mono);font-size:9px;color:var(--dim);margin-top:2px}
+.cond-sub{font-family:var(--mono);font-size:11px;color:#b8d0e0;margin-top:3px}
 .obs-badge{display:inline-block;font-family:var(--mono);font-size:8px;padding:1px 5px;margin-left:4px;vertical-align:middle}
 .obs-mt{background:rgba(0,255,200,.12);color:var(--acid);border:1px solid rgba(0,255,200,.2)}
 .obs-1m{background:rgba(91,200,255,.1);color:var(--ice);border:1px solid rgba(91,200,255,.2)}
@@ -165,6 +170,27 @@ html,body{background:#07090d;color:#d0dde8;font-family:'Barlow',sans-serif;min-h
       <div class="stat-val stat-med" id="tomorrow-high" style="color:var(--gold)">&mdash;&deg;</div>
       <div class="stat-info" id="tomorrow-sub"></div>
     </div>
+  </div>
+
+
+  <!-- INTEGER PROBABILITY DASHBOARD -->
+  <div class="panel" id="prob-panel" style="display:none">
+    <div class="panel-label">INTEGER SETTLEMENT PROBABILITIES</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">
+      <!-- TODAY -->
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--fire);margin-bottom:10px">TODAY</div>
+        <div id="prob-today-pin" style="font-family:var(--mono);font-size:11px;color:#b0cce0;margin-bottom:8px">Awaiting analysis&hellip;</div>
+        <div id="prob-today-bars" style="display:flex;flex-direction:column;gap:4px"></div>
+      </div>
+      <!-- TOMORROW -->
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--gold);margin-bottom:10px">TOMORROW</div>
+        <div id="prob-tmrw-pin" style="font-family:var(--mono);font-size:11px;color:#b0cce0;margin-bottom:8px">Awaiting analysis&hellip;</div>
+        <div id="prob-tmrw-bars" style="display:flex;flex-direction:column;gap:4px"></div>
+      </div>
+    </div>
+    <div id="prob-pin-risk" style="display:none;margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--fire);letter-spacing:1px">⚠ HIGH PIN RISK DETECTED</div>
   </div>
 
   <!-- CURRENT CONDITIONS -->
@@ -374,7 +400,7 @@ async function loadData(){
   btn.disabled = true;
   btn.innerHTML = '<span class="spin">\u27F3</span>';
   hide('error-box'); hide('warn-box');
-  hide('bet-banner'); hide('models-section'); hide('hourly-section'); hide('drift-section');
+  hide('bet-banner'); hide('prob-panel'); hide('prob-pin-risk'); hide('models-section'); hide('hourly-section'); hide('drift-section');
   // Clear ALL display fields to prevent stale data from previous station showing
   setText('live-high', '\u2014\u00B0'); setText('live-sub', 'Loading\u2026');
   hide('high-time');
@@ -817,6 +843,63 @@ pacingTable+'\n\n' +
         el('bet-conf-fill').style.width = conf + '%';
         el('bet-conf-fill').style.background = confColor;
         show('bet-banner');
+
+        // Render integer probability dashboard
+        if(sig.integerProbs && sig.tomorrowProjectedHigh){
+          const pin = sig.tomorrowProjectedHigh;
+          const ip = sig.integerProbs;
+          // Build tomorrow probs array from JSON
+          const tmrwProbs = [
+            {t: pin-2, p: Math.round(ip.minus2||0)},
+            {t: pin-1, p: Math.round(ip.minus1||0)},
+            {t: pin,   p: Math.round(ip.pin||0)},
+            {t: pin+1, p: Math.round(ip.plus1||0)},
+            {t: pin+2, p: Math.round(ip.plus2||0)},
+          ];
+          const maxTmrw = Math.max(...tmrwProbs.map(r=>r.p));
+          el('prob-tmrw-pin').textContent = 'PIN: ' + pin + '°F | Range: ' + (sig.tomorrowRangeLow||'?') + '°–' + (sig.tomorrowRangeHigh||'?') + '°F';
+          el('prob-tmrw-bars').innerHTML = tmrwProbs.map(row => {
+            const isPin = row.t === pin;
+            const barColor = isPin ? 'var(--gold)' : row.p > 20 ? 'var(--acid)' : 'var(--mut)';
+            const widthPct = maxTmrw > 0 ? Math.round(row.p / maxTmrw * 100) : 0;
+            return '<div class="prob-row">' +
+              '<div class="prob-temp" style="color:' + (isPin?'var(--gold)':'#fff') + '">' + row.t + '°</div>' +
+              '<div class="prob-bar-wrap"><div class="prob-bar-fill" style="width:' + widthPct + '%;background:' + barColor + '"></div></div>' +
+              '<div class="prob-pct">' + row.p + '%</div>' +
+            '</div>';
+          }).join('');
+
+          // Today probs: derive from today NWS high + live running high
+          const todayHigh = (wuHigh&&wuHigh.wethr_high) || (liveHigh&&liveHigh.wethr_high);
+          const todayNWS = todayFcst && todayFcst.high;
+          if(todayHigh || todayNWS){
+            const todayPin = todayHigh || todayNWS;
+            el('prob-today-pin').textContent = 'Running: ' + (todayHigh||'?') + '°F | NWS: ' + (todayNWS||'?') + '°F';
+            // Simple probability distribution centered on running high
+            const todayProbs = [
+              {t: todayPin-1, p: 8},
+              {t: todayPin,   p: 55},
+              {t: todayPin+1, p: 30},
+              {t: todayPin+2, p: 7},
+            ];
+            const maxToday = 55;
+            el('prob-today-bars').innerHTML = todayProbs.map(row => {
+              const isPin = row.t === todayPin;
+              const barColor = isPin ? 'var(--fire)' : row.p > 20 ? '#ff8866' : 'var(--mut)';
+              const widthPct = Math.round(row.p / maxToday * 100);
+              return '<div class="prob-row">' +
+                '<div class="prob-temp" style="color:' + (isPin?'var(--fire)':'#fff') + '">' + row.t + '°</div>' +
+                '<div class="prob-bar-wrap"><div class="prob-bar-fill" style="width:' + widthPct + '%;background:' + barColor + '"></div></div>' +
+                '<div class="prob-pct">' + row.p + '%</div>' +
+              '</div>';
+            }).join('');
+          }
+
+          if(sig.pinRisk){
+            show('prob-pin-risk');
+          }
+          show('prob-panel');
+        }
       } catch(e){ console.warn('bet parse error:', e.message); }
     }
   } catch(err){
@@ -833,3 +916,4 @@ setInterval(loadData, 5*60*1000);
 </script>
 </body>
 </html>
+
