@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="StormEdge">
+<meta name="theme-color" content="#07090d">
+<title>StormEdge — High Temp Betting Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { height:100%; }
+body { background:#07090d; color:#d0dde8; font-family:'Barlow',sans-serif; -webkit-font-smoothing:antialiased; height:100%; overflow-x:hidden; }
+:root {
+  --acid:#00ffc8; --fire:#ff5533; --gold:#ffcb47; --ice:#5bc8ff;
+  --bg:#07090d; --s1:#0d1520; --s2:#111c2a; --s3:#162133;
+  --bd:rgba(0,255,200,0.1); --bd2:rgba(0,255,200,0.2);
+  --mut:#3b5268; --dim:#7a9ab8;
+  --mono:'Share Tech Mono',monospace;
+  --cond:'Barlow Condensed',sans-serif;
+}
+::-webkit-scrollbar{width:3px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:var(--s3)}
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.25} }
+@keyframes glow { 0%,100%{text-shadow:0 0 20px rgba(0,255,200,.3)} 50%{text-shadow:0 0 50px rgba(0,255,200,.8)} }
+@keyframes scanline { 0%{top:-2px} 100%{top:100%} }
+@keyframes spin { to{transform:rotate(360deg)} }
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+
+.fade-up { animation:fadeUp .35s ease both; }
+.pulse-anim { animation:pulse 1.6s ease-in-out infinite; }
+.spin { display:inline-block; animation:spin 1s linear infinite; }
+
+/* ── LAYOUT ── */
+#app { min-height:100vh; }
+
+/* ── SHARED COMPONENTS ── */
+.chip {
+  display:inline-flex; align-items:center; gap:5px;
+  background:rgba(0,255,200,.08); border:1px solid var(--bd);
+  color:var(--acid); font-family:var(--mono); font-size:9px;
+  padding:3px 8px; letter-spacing:1px;
+}
+.chip.fire { background:rgba(255,85,51,.08); border-color:rgba(255,85,51,.25); color:var(--fire); }
+.chip.gold { background:rgba(255,203,71,.08); border-color:rgba(255,203,71,.25); color:var(--gold); }
+.chip.green { background:rgba(0,230,118,.08); border-color:rgba(0,230,118,.25); color:#00e676; }
+
+.section-head {
+  font-family:var(--mono); font-size:9px; letter-spacing:3px;
+  color:var(--mut); text-transform:uppercase; margin-bottom:10px;
+  display:flex; align-items:center; gap:8px;
+}
+.section-head::after { content:''; flex:1; height:1px; background:var(--bd); }
+
+.conf-bar { height:3px; background:rgba(255,255,255,.06); border-radius:2px; margin-top:8px; overflow:hidden; }
+.conf-fill { height:100%; border-radius:2px; transition:width 1.2s ease; }
+
+.bet-pill {
+  font-family:var(--cond); font-weight:900; letter-spacing:2px;
+  padding:5px 16px; border:2px solid; display:inline-block;
+}
+.bet-pill.over { color:#00e676; border-color:#00e676; background:rgba(0,230,118,.08); }
+.bet-pill.under { color:var(--fire); border-color:var(--fire); background:rgba(255,85,51,.08); }
+.bet-pill.pass { color:var(--gold); border-color:var(--gold); background:rgba(255,203,71,.08); }
+
+.error-box { background:rgba(255,85,51,.07); border:1px solid rgba(255,85,51,.2); color:#ff9999; padding:12px 16px; font-family:var(--mono); font-size:11px; margin:12px 0; }
+
+/* ═══════════════════════════════════════════════
+   MOBILE  (< 640px)
+═══════════════════════════════════════════════ */
+@media (max-width: 639px) {
+  .desktop-only { display:none !important; }
+
+  .mob-app { display:flex; flex-direction:column; height:100vh; max-width:430px; margin:0 auto; background:var(--bg); }
+
+  /* header */
+  .mob-hdr { background:var(--s1); border-bottom:1px solid var(--bd); padding:14px 16px 12px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+  .logo { font-family:var(--cond); font-weight:900; font-size:24px; letter-spacing:3px; color:var(--acid); }
+  .logo em { color:var(--fire); font-style:normal; }
+  .mob-refresh-btn { background:none; border:1px solid var(--bd); color:var(--acid); padding:7px 13px; font-family:var(--mono); font-size:10px; letter-spacing:1px; cursor:pointer; }
+
+  /* station bar */
+  .mob-station-bar { background:var(--s2); border-bottom:1px solid var(--bd); padding:11px 16px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; flex-shrink:0; }
+  .mob-station-name { font-family:var(--cond); font-weight:700; font-size:18px; letter-spacing:.5px; }
+  .mob-station-meta { display:flex; align-items:center; gap:10px; }
+  .mob-station-code { font-family:var(--mono); font-size:10px; color:var(--acid); }
+  .mob-update-time { font-family:var(--mono); font-size:9px; color:var(--mut); }
+
+  /* tabs */
+  .mob-tabs { display:flex; background:var(--s1); border-bottom:1px solid var(--bd); flex-shrink:0; }
+  .mob-tab { flex:1; padding:12px 4px; font-family:var(--cond); font-weight:700; font-size:14px; letter-spacing:2px; text-align:center; cursor:pointer; color:var(--mut); border:none; background:none; border-bottom:2px solid transparent; transition:color .2s,border-color .2s; }
+  .mob-tab.active { color:var(--acid); border-bottom-color:var(--acid); }
+
+  /* content */
+  .mob-content { flex:1; overflow-y:auto; padding:12px 12px 80px; -webkit-overflow-scrolling:touch; }
+
+  /* bottom nav */
+  .mob-nav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:430px; background:var(--s1); border-top:1px solid var(--bd); display:flex; z-index:50; padding-bottom:env(safe-area-inset-bottom); }
+  .mob-nav-btn { flex:1; padding:11px 4px 13px; text-align:center; cursor:pointer; border:none; background:none; color:var(--mut); font-family:var(--mono); font-size:8px; letter-spacing:1px; transition:color .2s; }
+  .mob-nav-btn.active { color:var(--acid); }
+  .mob-nav-icon { font-size:18px; display:block; margin-bottom:3px; }
+
+  /* station sheet */
+  .mob-sheet-overlay { position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:200; display:flex; align-items:flex-end; }
+  .mob-sheet { background:var(--s1); border-top:2px solid var(--acid); width:100%; max-height:75vh; display:flex; flex-direction:column; animation:slideUp .25s ease; }
+  .mob-sheet-handle { width:36px; height:4px; background:var(--mut); border-radius:2px; margin:10px auto; flex-shrink:0; }
+  .mob-sheet-search { width:100%; background:var(--bg); border:none; border-bottom:1px solid var(--bd); color:#fff; padding:12px 16px; font-family:var(--mono); font-size:13px; outline:none; flex-shrink:0; }
+  .mob-sheet-list { overflow-y:auto; flex:1; -webkit-overflow-scrolling:touch; }
+  .mob-sheet-item { padding:14px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,.04); cursor:pointer; }
+  .mob-sheet-item:active, .mob-sheet-item.active { background:rgba(0,255,200,.07); }
+  .mob-sheet-item-name { font-size:14px; font-weight:500; }
+  .mob-sheet-item-code { font-family:var(--mono); font-size:10px; color:var(--acid); }
+
+  /* big cards */
+  .big-card { background:var(--s1); border:1px solid var(--bd); padding:18px 16px; margin-bottom:10px; position:relative; overflow:hidden; }
+  .big-card::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; }
+  .big-card.acid::before { background:var(--acid); }
+  .big-card.fire::before { background:var(--fire); }
+  .big-card.gold::before { background:var(--gold); }
+  .big-lbl { font-family:var(--mono); font-size:9px; letter-spacing:3px; color:var(--mut); text-transform:uppercase; margin-bottom:6px; }
+  .big-num { font-family:var(--cond); font-weight:900; line-height:1; }
+  .big-num.xl { font-size:70px; }
+  .big-num.lg { font-size:54px; }
+  .big-sub { font-family:var(--mono); font-size:10px; color:var(--dim); margin-top:6px; }
+
+  /* bet card */
+  .bet-card { background:var(--s1); border:1px solid var(--bd); padding:16px; margin-bottom:10px; }
+  .bet-card-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .bet-pill-lg { font-size:22px; }
+  .bet-proj-block { text-align:right; }
+  .bet-proj-num { font-family:var(--cond); font-weight:900; font-size:28px; color:var(--gold); }
+  .bet-proj-range { font-family:var(--mono); font-size:9px; color:var(--mut); }
+  .bet-note-text { font-size:12px; color:var(--dim); line-height:1.65; border-top:1px solid var(--bd); padding-top:10px; }
+
+  /* models row */
+  .models-scroll { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin-bottom:10px; -webkit-overflow-scrolling:touch; }
+  .model-chip { background:var(--s1); border:1px solid var(--bd); padding:10px 12px; text-align:center; min-width:66px; flex-shrink:0; }
+  .model-chip-name { font-family:var(--mono); font-size:8px; color:var(--mut); margin-bottom:4px; letter-spacing:1px; }
+  .model-chip-val { font-family:var(--cond); font-weight:900; font-size:24px; }
+
+  /* hourly */
+  .hourly-card { background:var(--s1); border:1px solid var(--bd); padding:14px; margin-bottom:10px; }
+  .h-bars { display:flex; align-items:flex-end; gap:3px; height:68px; }
+  .h-bar { flex:1; border-radius:2px 2px 0 0; min-width:0; }
+  .h-labels { display:flex; gap:3px; margin-top:4px; }
+  .h-label { flex:1; font-family:var(--mono); font-size:7px; color:var(--mut); text-align:center; min-width:0; overflow:hidden; }
+
+  /* drift */
+  .drift-scroll { display:flex; gap:6px; overflow-x:auto; margin-bottom:10px; -webkit-overflow-scrolling:touch; }
+  .drift-chip { background:var(--s1); border:1px solid var(--bd); padding:9px 12px; text-align:center; min-width:54px; flex-shrink:0; }
+  .drift-v { font-family:var(--mono); font-size:8px; color:var(--mut); margin-bottom:2px; }
+  .drift-h { font-family:var(--cond); font-weight:900; font-size:22px; }
+
+  /* analysis */
+  .analysis-card { background:var(--s1); border:1px solid var(--bd); padding:16px; margin-bottom:10px; }
+  .analysis-text { font-size:13px; line-height:1.85; color:var(--dim); }
+  .analysis-text h2 { font-family:var(--cond); font-size:13px; font-weight:700; letter-spacing:1px; color:#cdd9e3; margin:14px 0 5px; text-transform:uppercase; border-left:3px solid var(--acid); padding-left:8px; }
+}
+
+/* ═══════════════════════════════════════════════
+   DESKTOP  (≥ 640px)
+═══════════════════════════════════════════════ */
+@media (min-width: 640px) {
+  .mobile-only { display:none !important; }
+
+  body::before { content:''; position:fixed; left:0; right:0; height:2px; background:rgba(0,255,200,.04); animation:scanline 9s linear infinite; pointer-events:none; z-index:999; }
+
+  .desk-app { min-height:100vh; }
+  .desk-wrap { max-width:1140px; margin:0 auto; padding:26px 22px; }
+
+  /* header */
+  .desk-hdr { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--bd); }
+  .logo { font-family:var(--cond); font-weight:900; font-size:34px; letter-spacing:4px; color:var(--acid); text-shadow:0 0 30px rgba(0,255,200,.2); }
+  .logo em { color:var(--fire); font-style:normal; }
+  .desk-tagline { font-family:var(--mono); font-size:10px; color:var(--mut); letter-spacing:2px; margin-top:3px; }
+  .desk-hdr-right { display:flex; align-items:center; gap:14px; }
+  .desk-update-time { font-family:var(--mono); font-size:10px; color:var(--mut); }
+  .desk-refresh-btn { background:none; border:1px solid var(--bd); color:var(--acid); padding:8px 18px; font-family:var(--mono); font-size:10px; letter-spacing:1px; cursor:pointer; transition:all .2s; }
+  .desk-refresh-btn:hover { background:rgba(0,255,200,.06); border-color:var(--bd2); }
+  .desk-refresh-btn:disabled { opacity:.3; cursor:not-allowed; }
+
+  /* station picker */
+  .desk-picker { position:relative; margin-bottom:18px; }
+  .desk-picker-btn { width:100%; background:var(--s1); border:1px solid var(--bd); color:#fff; padding:13px 20px; text-align:left; cursor:pointer; display:flex; justify-content:space-between; align-items:center; transition:border-color .2s; font-family:var(--cond); font-size:19px; font-weight:700; letter-spacing:1px; }
+  .desk-picker-btn:hover { border-color:var(--bd2); }
+  .desk-picker-code { font-family:var(--mono); font-size:12px; color:var(--acid); }
+  .desk-picker-drop { position:absolute; top:100%; left:0; right:0; background:#0c1929; border:1px solid var(--acid); z-index:100; max-height:340px; overflow-y:auto; }
+  .desk-picker-search { width:100%; background:var(--bg); border:none; border-bottom:1px solid var(--bd); color:#fff; padding:11px 16px; font-family:var(--mono); font-size:12px; outline:none; }
+  .desk-picker-item { padding:11px 18px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; font-size:13px; transition:background .15s; border-bottom:1px solid rgba(255,255,255,.03); }
+  .desk-picker-item:hover, .desk-picker-item.sel { background:rgba(0,255,200,.07); }
+  .desk-picker-item-code { font-family:var(--mono); font-size:10px; color:var(--acid); }
+
+  /* stats strip */
+  .stats-strip { display:grid; grid-template-columns:2fr 1fr 1fr; gap:14px; margin-bottom:14px; }
+  .stat-block { background:var(--s1); border:1px solid var(--bd); padding:20px 22px; position:relative; overflow:hidden; }
+  .stat-block::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; }
+  .stat-block.acid::after { background:linear-gradient(90deg,var(--acid),transparent); }
+  .stat-block.fire::after { background:linear-gradient(90deg,var(--fire),transparent); }
+  .stat-block.gold::after { background:linear-gradient(90deg,var(--gold),transparent); }
+  .stat-lbl { font-family:var(--mono); font-size:9px; letter-spacing:3px; color:var(--mut); text-transform:uppercase; margin-bottom:8px; }
+  .stat-val { font-family:var(--cond); font-weight:900; line-height:1; }
+  .stat-val.xl { font-size:68px; }
+  .stat-val.lg { font-size:52px; }
+  .stat-info { font-family:var(--mono); font-size:10px; color:var(--dim); margin-top:6px; }
+
+  /* bet banner */
+  .bet-banner { background:var(--s2); border:1px solid var(--bd); padding:16px 22px; margin-bottom:14px; display:grid; grid-template-columns:auto auto auto auto 1fr; gap:28px; align-items:center; position:relative; overflow:hidden; }
+  .bet-banner::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--acid),var(--fire),transparent); }
+  .bb-lbl { font-family:var(--mono); font-size:8px; letter-spacing:3px; color:var(--mut); margin-bottom:5px; text-transform:uppercase; }
+  .bb-val { font-family:var(--cond); font-weight:900; }
+  .bb-note { font-size:12px; color:var(--dim); line-height:1.6; }
+
+  /* panels */
+  .panel { background:var(--s1); border:1px solid var(--bd); padding:18px 20px; }
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+
+  /* models */
+  .models-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .model-box { background:var(--s2); border:1px solid var(--bd); padding:12px 8px; text-align:center; }
+  .model-box-name { font-family:var(--mono); font-size:8px; letter-spacing:2px; color:var(--mut); margin-bottom:5px; }
+  .model-box-val { font-family:var(--cond); font-weight:900; font-size:28px; }
+
+  /* hourly */
+  .h-bars-desk { display:flex; align-items:flex-end; gap:3px; height:80px; }
+  .h-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; }
+  .h-col-bar { width:100%; border-radius:1px 1px 0 0; }
+  .h-col-temp { font-family:var(--mono); font-size:7px; color:#fff; }
+  .h-col-hr { font-family:var(--mono); font-size:7px; color:var(--mut); }
+
+  /* drift */
+  .drift-strip { display:flex; gap:6px; flex-wrap:wrap; }
+  .drift-box { background:var(--s2); border:1px solid var(--bd); padding:9px 13px; text-align:center; }
+  .d-v { font-family:var(--mono); font-size:8px; color:var(--mut); margin-bottom:2px; }
+  .d-h { font-family:var(--cond); font-weight:900; font-size:22px; }
+
+  /* analysis */
+  .analysis-panel { background:var(--s1); border:1px solid var(--bd); padding:22px; margin-bottom:14px; }
+  .analysis-head { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .a-badge { background:var(--acid); color:#000; font-family:var(--mono); font-size:9px; letter-spacing:2px; padding:3px 9px; font-weight:700; }
+  .a-title { font-family:var(--cond); font-size:18px; font-weight:700; letter-spacing:2px; }
+  .analysis-body { font-size:13px; line-height:1.9; color:var(--dim); }
+  .analysis-body h2 { font-family:var(--cond); font-size:13px; font-weight:700; letter-spacing:2px; color:#cdd9e3; margin:14px 0 5px; text-transform:uppercase; border-left:3px solid var(--acid); padding-left:10px; }
+
+  .desk-footer { font-family:var(--mono); font-size:9px; color:var(--mut); text-align:center; padding-top:16px; border-top:1px solid var(--bd); letter-spacing:1px; }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+const STATIONS = [
+  {code:"KNYC",name:"New York (Central Park)"},{code:"KLGA",name:"New York (LaGuardia)"},
+  {code:"KBOS",name:"Boston"},{code:"KPHL",name:"Philadelphia"},{code:"KDCA",name:"Washington D.C."},
+  {code:"KCLT",name:"Charlotte"},{code:"KATL",name:"Atlanta"},{code:"KMIA",name:"Miami"},
+  {code:"KJAX",name:"Jacksonville"},{code:"KMDW",name:"Chicago (Midway)"},{code:"KORD",name:"Chicago (O'Hare)"},
+  {code:"KDTW",name:"Detroit"},{code:"KMSP",name:"Minneapolis"},{code:"KBNA",name:"Nashville"},
+  {code:"KMSY",name:"New Orleans"},{code:"KOKC",name:"Oklahoma City"},{code:"KDFW",name:"Dallas/Ft Worth"},
+  {code:"KDAL",name:"Dallas (Love Field)"},{code:"KHOU",name:"Houston"},{code:"KSAT",name:"San Antonio"},
+  {code:"KAUS",name:"Austin"},{code:"KDEN",name:"Denver"},{code:"KBKF",name:"Aurora (Buckley)"},
+  {code:"KPHX",name:"Phoenix"},{code:"KLAS",name:"Las Vegas"},{code:"KLAX",name:"Los Angeles"},
+  {code:"KSFO",name:"San Francisco"},{code:"KSEA",name:"Seattle"},
+];
+const MODELS = ["GFS","HRRR","NBM","NAM","ECMWF-IFS"];
+
+function getToday() { return new Date().toISOString().split("T")[0]; }
+function getTomorrow() { const d=new Date(); d.setDate(d.getDate()+1); return d.toISOString().split("T")[0]; }
+
+async function wfetch(path) {
+  const [file, qs] = path.replace(/^\//, '').split('?');
+  const url = `/.netlify/functions/wethr?_file=${encodeURIComponent(file)}&${qs||''}`;
+  const r = await fetch(url);
+  if(!r.ok){const e=await r.json().catch(()=>({})); throw new Error(e.error||`HTTP ${r.status}`);}
+  return r.json();
+}
+
+// ── STATE ──
+let state = {
+  station: STATIONS[0],
+  tab: "today",
+  showPicker: false,
+  showSheet: false,
+  search: "",
+  loading: false,
+  error: null,
+  liveHigh: null,
+  latestObs: null,
+  todayFcst: null,
+  tomorrowFcst: null,
+  modelForecasts: [],
+  forecastHistory: null,
+  analysis: "",
+  analysisLoading: false,
+  betSignal: null,
+  lastRefresh: null,
+  isMobile: window.innerWidth < 640,
+};
+
+function setState(updates) {
+  state = {...state, ...updates};
+  render();
+}
+
+// ── DATA FETCH ──
+async function fetchAll(station) {
+  setState({loading:true, error:null, analysis:"", betSignal:null, modelForecasts:[]});
+  try {
+    const today = getToday(), tomorrow = getTomorrow();
+    const [liveHigh, latestObs, todayFcst, tomorrowFcst, forecastHistory] = await Promise.all([
+      wfetch(`/observations.php?station_code=${station.code}&mode=wethr_high&logic=nws`),
+      wfetch(`/observations.php?station_code=${station.code}&mode=latest`),
+      wfetch(`/nws_forecasts.php?station_code=${station.code}&date=${today}&mode=latest`),
+      wfetch(`/nws_forecasts.php?station_code=${station.code}&date=${tomorrow}&mode=latest`),
+      wfetch(`/nws_forecasts.php?station_code=${station.code}&date=${today}&mode=history`).catch(()=>null),
+    ]);
+
+    const now = new Date();
+    const ps = new Date(now); ps.setUTCHours(15,0,0,0);
+    const pe = new Date(now); pe.setUTCHours(23,0,0,0);
+    const psStr = ps.toISOString().split(".")[0]+"Z";
+    const peStr = pe.toISOString().split(".")[0]+"Z";
+
+    const mResults = await Promise.allSettled(
+      MODELS.map(m => wfetch(`/forecasts.php?location_name=${station.code}&start_valid_time=${psStr}&end_valid_time=${peStr}&model=${m}`))
+    );
+    const modelForecasts = [];
+    mResults.forEach((r,i)=>{
+      if(r.status==="fulfilled"&&Array.isArray(r.value)&&r.value.length>0){
+        const max = Math.max(...r.value.map(d=>d.temperature_f).filter(Boolean));
+        if(max>0) modelForecasts.push({model:MODELS[i], high:Math.round(max)});
+      }
+    });
+
+    setState({liveHigh, latestObs, todayFcst, tomorrowFcst, forecastHistory, modelForecasts, loading:false, lastRefresh:new Date()});
+    runLLM(station, liveHigh, latestObs, todayFcst, tomorrowFcst, modelForecasts, forecastHistory);
+  } catch(e) {
+    setState({loading:false, error:e.message});
+  }
+}
+
+async function runLLM(station, liveHigh, obs, todayFcst, tomorrowFcst, models, history) {
+  setState({analysisLoading:true});
+  const histVer = history?.forecasts?.slice(-4).map(v=>({v:v.version,high:v.high}));
+  const prompt = `You are a forensic meteorologist for temperature betting markets (Kalshi/Wethr.net).
+STATION: ${station.name} (${station.code}) | DATE: ${getToday()}
+LIVE WETHR HIGH (NWS): ${liveHigh?.wethr_high??'N/A'}°F | LIVE LOW: ${liveHigh?.wethr_low??'N/A'}°F
+CURRENT TEMP: ${obs?.temperature_display??'N/A'}°F | HUMIDITY: ${obs?.relative_humidity??'N/A'}%
+TODAY NWS FORECAST HIGH: ${todayFcst?.high??'N/A'}°F (v${todayFcst?.version})
+TOMORROW NWS FORECAST HIGH: ${tomorrowFcst?.high??'N/A'}°F (v${tomorrowFcst?.version})
+FORECAST VERSION HISTORY: ${histVer?JSON.stringify(histVer):'N/A'}
+MODEL CONSENSUS: ${models.map(m=>`${m.model}:${m.high}°F`).join(', ')}
+Provide sharp betting intelligence with sections:
+## TODAY'S HIGH — Is it locked in or can it still move?
+## TOMORROW'S HIGH — Best projection with confidence range. Key drivers.
+## BETTING EDGE — OVER or UNDER on tomorrow's high line. Be direct and opinionated.
+## RISK FLAGS — What could invalidate this analysis?`;
+
+  try {
+    const r = await fetch("/.netlify/functions/claude",{
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:prompt}]})
+    });
+    const d = await r.json();
+    const text = d.content?.map(b=>b.text||"").join("\n")||"";
+    setState({analysis:text});
+
+    const betR = await fetch("/.netlify/functions/claude",{
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:300,messages:[{role:"user",content:`Weather for ${station.name}: today NWS high ${todayFcst?.high}°F v${todayFcst?.version}, tomorrow ${tomorrowFcst?.high}°F v${tomorrowFcst?.version}, live high ${liveHigh?.wethr_high}°F, models: ${models.map(m=>`${m.model}:${m.high}`).join(",")}, history:${JSON.stringify(histVer)}.
+Return ONLY valid JSON no markdown: {"todayProjectedFinal":number,"tomorrowProjectedHigh":number,"tomorrowRangeLow":number,"tomorrowRangeHigh":number,"tomorrowConfidence":number,"modelSpread":number,"modelMean":number,"trendDirection":"UP"|"DOWN"|"FLAT","betSide":"OVER"|"UNDER"|"PASS","betEdge":"STRONG"|"MODERATE"|"WEAK","betNote":"one sentence"}`}]})
+    });
+    const bd = await betR.json();
+    const bt = bd.content?.map(b=>b.text||"").join("").trim();
+    try { setState({betSignal:JSON.parse(bt.replace(/```json|```/g,"").trim())}); } catch{}
+  } catch(e) { setState({analysis:"Analysis unavailable."}); }
+  finally { setState({analysisLoading:false}); }
+}
+
+// ── HELPERS ──
+function formatAnalysis(text) {
+  return text
+    .replace(/## (.+)/g,'<h2>$1</h2>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong style="color:#cdd9e3">$1</strong>')
+    .replace(/\n/g,'<br>');
+}
+
+function hourlyBars(hourly, hue, forMobile) {
+  if(!hourly.length) return '';
+  const mx = Math.max(...hourly.map(h=>h.t));
+  const mn = Math.min(...hourly.map(h=>h.t));
+  const rng = mx-mn||1;
+  if(forMobile) {
+    return `
+      <div class="h-bars">
+        ${hourly.map(h=>{
+          const pct=(h.t-mn)/rng;
+          const ht=Math.max(8,pct*60);
+          return `<div class="h-bar" style="height:${ht}px;background:hsl(${hue-pct*20},90%,58%);opacity:${0.5+pct*0.5}"></div>`;
+        }).join('')}
+      </div>
+      <div class="h-labels">
+        ${hourly.map(h=>`<div class="h-label">${String(h.h).padStart(2,'0')}</div>`).join('')}
+      </div>`;
+  } else {
+    return `<div class="h-bars-desk">
+      ${hourly.map(h=>{
+        const pct=(h.t-mn)/rng;
+        const ht=Math.max(6,pct*72);
+        return `<div class="h-col">
+          <div class="h-col-temp">${h.t}°</div>
+          <div class="h-col-bar" style="height:${ht}px;background:hsl(${hue-pct*18},90%,58%);opacity:${0.5+pct*0.5}"></div>
+          <div class="h-col-hr">${String(h.h).padStart(2,'0')}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+}
+
+// ── RENDER ──
+function render() {
+  const s = state;
+  const isMob = s.isMobile;
+  const todayHourly = s.todayFcst?.hourly_temps?.map((t,i)=>({h:i,t})).filter(x=>x.t!==null)||[];
+  const tomorrowHourly = s.tomorrowFcst?.hourly_temps?.map((t,i)=>({h:i,t})).filter(x=>x.t!==null)||[];
+  const modelMean = s.modelForecasts.length ? Math.round(s.modelForecasts.reduce((a,m)=>a+m.high,0)/s.modelForecasts.length) : null;
+  const modelSpread = s.modelForecasts.length ? Math.max(...s.modelForecasts.map(m=>m.high)) - Math.min(...s.modelForecasts.map(m=>m.high)) : null;
+  const bs = s.betSignal;
+  const betClass = bs?.betSide==="OVER"?"over":bs?.betSide==="UNDER"?"under":"pass";
+  const betColor = bs?.betSide==="OVER"?"#00e676":bs?.betSide==="UNDER"?"var(--fire)":"var(--gold)";
+  const edgeColor = bs?.betEdge==="STRONG"?"#00e676":bs?.betEdge==="MODERATE"?"var(--gold)":"var(--fire)";
+  const trendColor = bs?.trendDirection==="UP"?"#00e676":bs?.trendDirection==="DOWN"?"var(--fire)":"var(--gold)";
+  const trendArrow = bs?.trendDirection==="UP"?"▲":bs?.trendDirection==="DOWN"?"▼":"▶";
+  const refreshLabel = s.loading ? `<span class="spin">⟳</span>` : "⟳ REFRESH";
+
+  const errHtml = s.error ? `<div class="error-box">⚠ ${s.error}</div>` : '';
+  const timeHtml = s.lastRefresh ? s.lastRefresh.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}) : '';
+
+  // ── ANALYSIS HTML ──
+  const analysisHtml = s.analysisLoading
+    ? `<div class="pulse-anim" style="font-family:var(--mono);font-size:11px;color:var(--mut)">◈ Analyzing NWS forecast versions and model spread…<br>◈ Computing forecast drift signals…<br>◈ Generating high temp betting edge…</div>`
+    : s.analysis
+      ? `<div class="${isMob?'analysis-text':'analysis-body'}">${formatAnalysis(s.analysis)}</div>`
+      : `<div style="font-family:var(--mono);font-size:11px;color:var(--mut)">Select a station to begin analysis.</div>`;
+
+  // ── DRIFT ──
+  const driftHtml = s.forecastHistory?.forecasts?.length > 1 ? s.forecastHistory.forecasts.map((v,i)=>{
+    const isLatest = i===s.forecastHistory.forecasts.length-1;
+    if(isMob) return `<div class="drift-chip" style="${isLatest?'border-color:var(--acid)':''}"><div class="drift-v">v${v.version}${isLatest?' ★':''}</div><div class="drift-h" style="color:${isLatest?'var(--fire)':'#fff'}">${v.high??'—'}°</div></div>`;
+    return `<div class="drift-box" style="${isLatest?'border-color:var(--acid)':''}"><div class="d-v">v${v.version}${isLatest?' ★':''}</div><div class="d-h" style="color:${isLatest?'var(--fire)':'#fff'}">${v.high??'—'}°</div></div>`;
+  }).join('') : '';
+
+  // ── MODELS ──
+  const modelsHtml = s.modelForecasts.map(m=>{
+    const diff = modelMean ? m.high - modelMean : 0;
+    const col = diff>1?"var(--fire)":diff<-1?"var(--ice)":"#fff";
+    if(isMob) return `<div class="model-chip"><div class="model-chip-name">${m.model}</div><div class="model-chip-val" style="color:${col}">${m.high}°</div></div>`;
+    return `<div class="model-box"><div class="model-box-name">${m.model}</div><div class="model-box-val" style="color:${col}">${m.high}°</div></div>`;
+  }).join('');
+
+  const modelChipsHtml = modelMean ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:${isMob?'4px':'12px'}">
+    <span class="chip">MEAN ${modelMean}°F</span>
+    <span class="chip ${modelSpread>4?'fire':''}"">SPREAD ${modelSpread}°F</span>
+    ${bs?.modelMean?`<span class="chip gold">AI ${bs.modelMean}°F</span>`:''}
+  </div>` : '';
+
+  const stationSearch = s.search.toLowerCase();
+  const filteredStations = STATIONS.filter(st=>st.name.toLowerCase().includes(stationSearch)||st.code.toLowerCase().includes(stationSearch));
+
+  if(isMob) {
+    // ══ MOBILE RENDER ══
+    const sheetHtml = s.showSheet ? `
+      <div class="mob-sheet-overlay" id="sheet-overlay">
+        <div class="mob-sheet">
+          <div class="mob-sheet-handle"></div>
+          <input class="mob-sheet-search" id="station-search" placeholder="Search city or code…" value="${s.search}" oninput="setState({search:this.value})">
+          <div class="mob-sheet-list">
+            ${filteredStations.map(st=>`
+              <div class="mob-sheet-item${st.code===s.station.code?' active':''}" onclick="selectStation('${st.code}')">
+                <span class="mob-sheet-item-name">${st.name}</span>
+                <span class="mob-sheet-item-code">${st.code}</span>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>` : '';
+
+    // TODAY TAB
+    const todayTab = `
+      <div class="fade-up">
+        <div class="big-card acid">
+          <div class="big-lbl">Live Running High · NWS Logic</div>
+          <div class="big-num xl" style="color:var(--acid);animation:glow 3s ease-in-out infinite">${s.liveHigh?.wethr_high??'—'}°</div>
+          <div class="big-sub">Current: ${s.latestObs?.temperature_display??'—'}°F &nbsp;·&nbsp; RH: ${s.latestObs?.relative_humidity??'—'}%</div>
+          ${s.liveHigh?.time_of_high_utc?`<span class="chip" style="margin-top:10px">SET ${new Date(s.liveHigh.time_of_high_utc).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} UTC</span>`:''}
+        </div>
+        <div class="big-card fire">
+          <div class="big-lbl">Today NWS Forecast High</div>
+          <div class="big-num lg" style="color:var(--fire)">${s.todayFcst?.high??'—'}°</div>
+          <div class="big-sub">DSM Official: ${s.latestObs?.dsm_high_display??'—'}°F &nbsp;·&nbsp; Forecast v${s.todayFcst?.version??'—'}</div>
+        </div>
+        ${todayHourly.length?`<div class="hourly-card"><div class="section-head">Hourly Today (LST)</div>${hourlyBars(todayHourly,10,true)}</div>`:''}
+        ${driftHtml?`<div class="section-head" style="margin-bottom:6px">Forecast Drift</div><div class="drift-scroll">${driftHtml}</div>`:''}
+      </div>`;
+
+    // TOMORROW TAB
+    const tomorrowTab = `
+      <div class="fade-up">
+        <div class="big-card gold">
+          <div class="big-lbl">Tomorrow NWS Forecast High</div>
+          <div class="big-num lg" style="color:var(--gold)">${s.tomorrowFcst?.high??'—'}°</div>
+          <div class="big-sub">Forecast v${s.tomorrowFcst?.version??'—'} &nbsp;·&nbsp; Low: ${s.tomorrowFcst?.low??'—'}°F</div>
+        </div>
+        ${bs?`
+        <div class="bet-card">
+          <div class="section-head">AI Bet Signal</div>
+          <div class="bet-card-row">
+            <div>
+              <div class="big-lbl">Recommended Side</div>
+              <div class="bet-pill ${betClass} bet-pill-lg">${bs.betSide}</div>
+              <div style="margin-top:8px"><span class="chip" style="color:${edgeColor};border-color:${edgeColor}33">${bs.betEdge} EDGE</span></div>
+            </div>
+            <div class="bet-proj-block">
+              <div class="big-lbl" style="text-align:right">LLM Projection</div>
+              <div class="bet-proj-num">${bs.tomorrowProjectedHigh}°F</div>
+              <div class="bet-proj-range">[${bs.tomorrowRangeLow}° – ${bs.tomorrowRangeHigh}°]</div>
+              <div class="conf-bar" style="width:100px"><div class="conf-fill" style="width:${bs.tomorrowConfidence}%;background:${bs.tomorrowConfidence>=70?'#00e676':'var(--gold)'}"></div></div>
+              <div style="font-family:var(--mono);font-size:9px;color:var(--mut);margin-top:3px">${bs.tomorrowConfidence}% CONF</div>
+            </div>
+          </div>
+          ${bs.betNote?`<div class="bet-note-text">${bs.betNote}</div>`:''}
+        </div>`:s.analysisLoading?`<div class="bet-card pulse-anim" style="font-family:var(--mono);font-size:11px;color:var(--mut)">Generating bet signal…</div>`:''}
+        ${s.modelForecasts.length?`
+          <div class="section-head">Model Consensus</div>
+          <div class="models-scroll">${modelsHtml}</div>
+          ${modelChipsHtml}
+        `:''}
+        ${tomorrowHourly.length?`<div class="hourly-card" style="margin-top:10px"><div class="section-head">Hourly Tomorrow (LST)</div>${hourlyBars(tomorrowHourly,45,true)}</div>`:''}
+      </div>`;
+
+    // ANALYSIS TAB
+    const analysisTab = `
+      <div class="fade-up">
+        <div class="analysis-card">
+          <div class="section-head"><span class="chip">FORENSIC AI</span></div>
+          ${analysisHtml}
+        </div>
+      </div>`;
+
+    const tabContent = s.tab==="today"?todayTab:s.tab==="tomorrow"?tomorrowTab:analysisTab;
+
+    document.getElementById('app').innerHTML = `
+      <div class="mob-app">
+        <div class="mob-hdr">
+          <div class="logo">STORM<em>EDGE</em></div>
+          <button class="mob-refresh-btn" onclick="fetchAll(state.station)" ${s.loading?'disabled':''}>${refreshLabel}</button>
+        </div>
+        <div class="mob-station-bar" onclick="setState({showSheet:true})">
+          <div>
+            <div class="mob-station-name">${s.station.name}</div>
+            ${timeHtml?`<div class="mob-update-time" style="margin-top:2px">Updated ${timeHtml}</div>`:''}
+          </div>
+          <div class="mob-station-meta">
+            <div class="mob-station-code">${s.station.code}</div>
+            <div style="font-size:12px;color:var(--mut)">▼</div>
+          </div>
+        </div>
+        <div class="mob-tabs">
+          <button class="mob-tab${s.tab==='today'?' active':''}" onclick="setState({tab:'today'})">TODAY</button>
+          <button class="mob-tab${s.tab==='tomorrow'?' active':''}" onclick="setState({tab:'tomorrow'})">TMRW</button>
+          <button class="mob-tab${s.tab==='analysis'?' active':''}" onclick="setState({tab:'analysis'})">AI</button>
+        </div>
+        <div class="mob-content">
+          ${errHtml}
+          ${tabContent}
+        </div>
+        <div class="mob-nav">
+          <button class="mob-nav-btn${s.tab==='today'?' active':''}" onclick="setState({tab:'today'})"><span class="mob-nav-icon">📡</span>TODAY</button>
+          <button class="mob-nav-btn${s.tab==='tomorrow'?' active':''}" onclick="setState({tab:'tomorrow'})"><span class="mob-nav-icon">🎯</span>TMRW</button>
+          <button class="mob-nav-btn${s.tab==='analysis'?' active':''}" onclick="setState({tab:'analysis'})"><span class="mob-nav-icon">🧠</span>AI</button>
+        </div>
+        ${sheetHtml}
+      </div>`;
+
+    // focus search if sheet open
+    if(s.showSheet) {
+      const el = document.getElementById('station-search');
+      if(el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+      document.getElementById('sheet-overlay')?.addEventListener('click', e => {
+        if(e.target.id==='sheet-overlay') setState({showSheet:false});
+      });
+    }
+
+  } else {
+    // ══ DESKTOP RENDER ══
+    const pickerDrop = s.showPicker ? `
+      <div class="desk-picker-drop">
+        <input class="desk-picker-search" id="desk-search" placeholder="Search…" value="${s.search}" oninput="setState({search:this.value})">
+        ${filteredStations.map(st=>`
+          <div class="desk-picker-item${st.code===s.station.code?' sel':''}" onclick="selectStation('${st.code}')">
+            <span>${st.name}</span><span class="desk-picker-item-code">${st.code}</span>
+          </div>`).join('')}
+      </div>` : '';
+
+    const betBanner = bs ? `
+      <div class="bet-banner fade-up">
+        <div>
+          <div class="bb-lbl">Bet Side</div>
+          <div class="bet-pill ${betClass}" style="font-size:22px">${bs.betSide}</div>
+        </div>
+        <div>
+          <div class="bb-lbl">Edge</div>
+          <div class="bb-val" style="font-size:28px;color:${edgeColor}">${bs.betEdge}</div>
+        </div>
+        <div>
+          <div class="bb-lbl">Trend</div>
+          <div class="bb-val" style="font-size:28px;color:${trendColor}">${trendArrow} ${bs.trendDirection}</div>
+        </div>
+        <div>
+          <div class="bb-lbl">LLM Projection — Tomorrow</div>
+          <div style="display:flex;align-items:baseline;gap:8px">
+            <div class="bb-val" style="font-size:36px;color:var(--gold)">${bs.tomorrowProjectedHigh}°F</div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--mut)">[${bs.tomorrowRangeLow}° – ${bs.tomorrowRangeHigh}°] · ${bs.tomorrowConfidence}%</div>
+          </div>
+          <div class="conf-bar" style="width:180px"><div class="conf-fill" style="width:${bs.tomorrowConfidence}%;background:${bs.tomorrowConfidence>=70?'#00e676':'var(--gold)'}"></div></div>
+        </div>
+        <div>
+          <div class="bb-lbl">Intelligence</div>
+          <div class="bb-note">${bs.betNote||''}</div>
+        </div>
+      </div>` : '';
+
+    document.getElementById('app').innerHTML = `
+      <div class="desk-app">
+        <div class="desk-wrap">
+          <div class="desk-hdr fade-up">
+            <div>
+              <div class="logo">STORM<em>EDGE</em></div>
+              <div class="desk-tagline">FORENSIC METEOROLOGY · HIGH TEMP BETTING INTELLIGENCE</div>
+            </div>
+            <div class="desk-hdr-right">
+              ${timeHtml?`<div class="desk-update-time">UPDATED ${timeHtml} · AUTO 5MIN</div>`:''}
+              <button class="desk-refresh-btn" onclick="fetchAll(state.station)" ${s.loading?'disabled':''}>${refreshLabel}</button>
+            </div>
+          </div>
+
+          <div class="desk-picker fade-up">
+            <button class="desk-picker-btn" onclick="setState({showPicker:!state.showPicker,search:''})">
+              <span>${s.station.name}</span>
+              <span class="desk-picker-code">${s.station.code} ${s.showPicker?'▲':'▼'}</span>
+            </button>
+            ${pickerDrop}
+          </div>
+
+          ${errHtml}
+
+          <div class="stats-strip fade-up">
+            <div class="stat-block acid">
+              <div class="stat-lbl">Live Running High · NWS Logic</div>
+              <div class="stat-val xl" style="color:var(--acid);animation:glow 3s ease-in-out infinite">${s.liveHigh?.wethr_high??'—'}°</div>
+              <div class="stat-info">Current: ${s.latestObs?.temperature_display??'—'}°F &nbsp;·&nbsp; RH: ${s.latestObs?.relative_humidity??'—'}%</div>
+              ${s.liveHigh?.time_of_high_utc?`<span class="chip" style="margin-top:10px;display:inline-flex">SET ${new Date(s.liveHigh.time_of_high_utc).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} UTC</span>`:''}
+            </div>
+            <div class="stat-block fire">
+              <div class="stat-lbl">Today NWS Forecast High</div>
+              <div class="stat-val lg" style="color:var(--fire)">${s.todayFcst?.high??'—'}°</div>
+              <div class="stat-info">DSM: ${s.latestObs?.dsm_high_display??'—'}°F &nbsp;·&nbsp; v${s.todayFcst?.version??'—'}</div>
+            </div>
+            <div class="stat-block gold">
+              <div class="stat-lbl">Tomorrow NWS Forecast High</div>
+              <div class="stat-val lg" style="color:var(--gold)">${s.tomorrowFcst?.high??'—'}°</div>
+              <div class="stat-info">Range: ${s.tomorrowFcst?.low??'—'}° – ${s.tomorrowFcst?.high??'—'}°F &nbsp;·&nbsp; v${s.tomorrowFcst?.version??'—'}</div>
+            </div>
+          </div>
+
+          ${betBanner}
+
+          ${s.modelForecasts.length?`
+          <div class="panel fade-up" style="margin-bottom:14px">
+            <div class="section-head">Model Consensus — Afternoon Peak High</div>
+            <div class="models-grid">${modelsHtml}</div>
+            ${modelChipsHtml}
+          </div>`:''}
+
+          ${(todayHourly.length||tomorrowHourly.length)?`
+          <div class="two-col fade-up">
+            ${todayHourly.length?`<div class="panel"><div class="section-head">Today Hourly (LST)</div>${hourlyBars(todayHourly,10,false)}</div>`:''}
+            ${tomorrowHourly.length?`<div class="panel"><div class="section-head">Tomorrow Hourly (LST)</div>${hourlyBars(tomorrowHourly,45,false)}</div>`:''}
+          </div>`:''}
+
+          ${driftHtml?`
+          <div class="panel fade-up" style="margin-bottom:14px">
+            <div class="section-head">Today's Forecast Drift (version history)</div>
+            <div class="drift-strip">${driftHtml}</div>
+          </div>`:''}
+
+          <div class="analysis-panel fade-up">
+            <div class="analysis-head">
+              <div class="a-badge">FORENSIC AI</div>
+              <div class="a-title">METEOROLOGIST INTELLIGENCE REPORT</div>
+            </div>
+            ${analysisHtml}
+          </div>
+
+          <div class="desk-footer">DATA: WETHR.NET API v2 · ANALYSIS: CLAUDE AI · NWS LOGIC · FOR INFORMATIONAL USE ONLY · NOT FINANCIAL ADVICE</div>
+        </div>
+      </div>`;
+
+    if(s.showPicker) {
+      const el = document.getElementById('desk-search');
+      if(el) el.focus();
+    }
+  }
+}
+
+// ── ACTIONS ──
+function selectStation(code) {
+  const st = STATIONS.find(s=>s.code===code);
+  if(!st) return;
+  state.station = st;
+  state.showPicker = false;
+  state.showSheet = false;
+  state.search = "";
+  fetchAll(st);
+}
+
+window.selectStation = selectStation;
+window.setState = setState;
+window.fetchAll = fetchAll;
+
+// ── INIT ──
+window.addEventListener('resize', () => setState({isMobile: window.innerWidth < 640}));
+render();
+fetchAll(state.station);
+setInterval(()=>fetchAll(state.station), 5*60*1000);
+</script>
+</body>
+</html>
