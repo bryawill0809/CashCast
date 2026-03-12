@@ -13,7 +13,7 @@ html,body{background:#07090d;color:#d0dde8;font-family:'Barlow',sans-serif;min-h
 :root{
   --acid:#00ffc8;--fire:#ff5533;--gold:#ffcb47;--ice:#5bc8ff;
   --bg:#07090d;--s1:#0d1520;--s2:#111c2a;
-  --bd:rgba(0,255,200,0.12);--mut:#5a7a94;--dim:#a8c4d8;
+  --bd:rgba(0,255,200,0.12);--mut:#5a7a94;--dim:#4da6ff;
   --mono:'Share Tech Mono',monospace;--cond:'Barlow Condensed',sans-serif;
 }
 @keyframes glow{0%,100%{text-shadow:0 0 20px rgba(0,255,200,.3)}50%{text-shadow:0 0 50px rgba(0,255,200,.8)}}
@@ -57,7 +57,7 @@ html,body{background:#07090d;color:#d0dde8;font-family:'Barlow',sans-serif;min-h
 .stat-val{font-family:var(--cond);font-weight:900;line-height:1}
 .stat-big{font-size:64px}
 .stat-med{font-size:50px}
-.stat-info{font-family:var(--mono);font-size:11px;color:#b0cce0;margin-top:6px}
+.stat-info{font-family:var(--mono);font-size:11px;color:#4da6ff;margin-top:6px}
 .chip{display:inline-block;background:rgba(0,255,200,.08);border:1px solid var(--bd);color:var(--acid);font-family:var(--mono);font-size:9px;padding:2px 8px;letter-spacing:1px;margin-top:8px}
 
 /* BET BANNER */
@@ -109,14 +109,14 @@ html,body{background:#07090d;color:#d0dde8;font-family:'Barlow',sans-serif;min-h
 .prob-temp{width:32px;color:#fff;text-align:right;flex-shrink:0}
 .prob-bar-wrap{flex:1;background:rgba(255,255,255,0.06);border-radius:2px;height:14px;overflow:hidden}
 .prob-bar-fill{height:100%;border-radius:2px;transition:width .4s ease}
-.prob-pct{width:36px;text-align:right;flex-shrink:0;color:#a8c4d8}
+.prob-pct{width:36px;text-align:right;flex-shrink:0;color:#4da6ff}
 .warn-box{background:rgba(255,203,71,.07);border:1px solid rgba(255,203,71,.2);color:var(--gold);padding:12px 16px;font-family:var(--mono);font-size:11px;margin-bottom:12px}
 .footer{font-family:var(--mono);font-size:9px;color:var(--mut);text-align:center;padding-top:14px;border-top:1px solid var(--bd);letter-spacing:1px}
 .spin{display:inline-block;animation:spin 1s linear infinite}
 .cond-item{background:var(--s1);border:1px solid var(--bd);padding:10px 12px;}
 .cond-label{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--mut);text-transform:uppercase;margin-bottom:4px}
 .cond-val{font-family:var(--cond);font-weight:700;font-size:20px;color:#fff}
-.cond-sub{font-family:var(--mono);font-size:11px;color:#b8d0e0;margin-top:3px}
+.cond-sub{font-family:var(--mono);font-size:11px;color:#4da6ff;margin-top:3px}
 .obs-badge{display:inline-block;font-family:var(--mono);font-size:8px;padding:1px 5px;margin-left:4px;vertical-align:middle}
 .obs-mt{background:rgba(0,255,200,.12);color:var(--acid);border:1px solid rgba(0,255,200,.2)}
 .obs-1m{background:rgba(91,200,255,.1);color:var(--ice);border:1px solid rgba(91,200,255,.2)}
@@ -180,13 +180,13 @@ html,body{background:#07090d;color:#d0dde8;font-family:'Barlow',sans-serif;min-h
       <!-- TODAY -->
       <div>
         <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--fire);margin-bottom:10px">TODAY</div>
-        <div id="prob-today-pin" style="font-family:var(--mono);font-size:11px;color:#b0cce0;margin-bottom:8px">Awaiting analysis&hellip;</div>
+        <div id="prob-today-pin" style="font-family:var(--mono);font-size:11px;color:#4da6ff;margin-bottom:8px">Awaiting analysis&hellip;</div>
         <div id="prob-today-bars" style="display:flex;flex-direction:column;gap:4px"></div>
       </div>
       <!-- TOMORROW -->
       <div>
         <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--gold);margin-bottom:10px">TOMORROW</div>
-        <div id="prob-tmrw-pin" style="font-family:var(--mono);font-size:11px;color:#b0cce0;margin-bottom:8px">Awaiting analysis&hellip;</div>
+        <div id="prob-tmrw-pin" style="font-family:var(--mono);font-size:11px;color:#4da6ff;margin-bottom:8px">Awaiting analysis&hellip;</div>
         <div id="prob-tmrw-bars" style="display:flex;flex-direction:column;gap:4px"></div>
       </div>
     </div>
@@ -267,34 +267,27 @@ html,body{background:#07090d;color:#d0dde8;font-family:'Barlow',sans-serif;min-h
 
 <script>
 const STATIONS = [
-  {code:"KNYC",tz:"America/New_York",name:"New York (Central Park)",climate:"Urban heat island effect inflates highs vs surrounding areas. Summer sea breeze can cap temps 5-8F below inland. NWS often underpredicts on SW flow days. Watch for late-day mixing that pushes highs past forecast. Winter inversions can trap cold air and suppress highs."},
-  {code:"KLGA",tz:"America/New_York",name:"New York (LaGuardia)",climate:"Coastal exposure means marine influence on hot days. Runway heat soak can artificially elevate obs in calm winds. Generally runs 2-4F warmer than KNYC on light wind days due to asphalt/concrete. Watch for sea breeze timing in summer."},
-  {code:"KBOS",tz:"America/New_York",name:"Boston",climate:"Strong marine influence - sea breeze frequently caps summer highs 8-12F below inland. Back-bay urban core can hold heat longer. NWS Boston historically conservative on high forecasts in summer. Onshore flow days are strong UNDER plays."},
-  {code:"KPHL",tz:"America/New_York",name:"Philadelphia",climate:"Urban heat corridor between NYC and DC. Minimal marine influence despite proximity to Delaware Bay. Hot air mass days see strong mixing - NWS often underpredicts highs by 2-4F on 850mb ridge days. One of the most reliable OVER stations in summer."},
-  {code:"KDCA",tz:"America/New_York",name:"Washington D.C.",climate:"Potomac River location creates humidity trap. Urban heat island among the strongest on East Coast. NWS WBC often conservative with highs. Watch 850mb temps - every 1C above normal adds ~1.5F to surface max. Notorious for exceeding forecast highs in heat waves."},
-  {code:"KCLT",tz:"America/New_York",name:"Charlotte",climate:"Piedmont location buffers from coastal marine influence. Afternoon thunderstorm threat can abruptly end high temp pacing. NWS GSP tends to be accurate. Urban heat growing with city expansion. Watch for elevated terrain influence dampening highs in NW flow."},
-  {code:"KATL",tz:"America/New_York",name:"Atlanta",climate:"Elevated terrain (1050ft) means highs run 3-5F lower than surrounding lowlands. Urban heat island significant. Afternoon convection frequently caps highs June-August - high temp often set before noon storms develop. NWS FFC reliable but storms create timing uncertainty."},
-  {code:"KMIA",tz:"America/New_York",name:"Miami",climate:"Sea breeze battle between Atlantic and Gulf sides is the dominant factor. High temp almost always set in late morning before sea breeze arrives 12-2pm. NWS MFL typically accurate. Summer highs are extremely consistent 88-92F range - low volatility market. Watch dry season (Nov-Apr) for higher spread days."},
-  {code:"KJAX",tz:"America/New_York",name:"Jacksonville",climate:"Inland enough to reduce marine influence vs Miami. More volatile than South Florida - 850mb temps matter more. Sea breeze typically arrives later (2-4pm) allowing higher max temps. Summer thunderstorm timing critical for high temp pacing."},
-  {code:"KMDW",tz:"America/Chicago",name:"Chicago (Midway)",climate:"Urban location in SW Chicago runs 2-4F warmer than KORD. Lake Michigan influence weakest here - more continental. Wind direction critical: SW flow = no lake influence = higher highs. NE/E flow = lake air = strong UNDER. Check 925mb wind direction before betting."},
-  {code:"KORD",tz:"America/Chicago",name:"Chicago (O'Hare)",climate:"NW suburban location is more exposed to lake breeze than KMDW on E/NE flow days. Lake Michigan effect can suppress highs 10-15F on onshore flow. SW flow days eliminate lake influence entirely. One of the highest variance stations - wind direction is everything."},
-  {code:"KDTW",tz:"America/Detroit",name:"Detroit",climate:"Great Lakes influence moderate - Lake Erie/St Clair effects less dramatic than Chicago/Milwaukee. Urban heat island significant. Continental air mass patterns dominate spring/fall. NWS DTX generally reliable. Watch for strong W flow bringing Lake Michigan-modified air."},
-  {code:"KMSP",tz:"America/Chicago",name:"Minneapolis",climate:"Deep continental location - no significant water body influence. Highly reactive to 850mb temperature anomalies. Spring/fall have highest variance. NWS MPX can underforecast on strong ridge days. Winter high temps heavily influenced by snow cover albedo."},
-  {code:"KBNA",tz:"America/Chicago",name:"Nashville",climate:"Cumberland River valley location creates localized thermal patterns. Urban heat growing. No significant water body effects. NWS OHX generally accurate. Strong synoptic forcing days (heat domes) see consistent OVER performance. Watch for valley fog suppressing morning temps and delaying high."},
-  {code:"KMSY",tz:"America/Chicago",name:"New Orleans",climate:"Lake Pontchartrain and Gulf proximity create persistent marine influence. High humidity means heat index often exceeds air temp. Actual high temp relatively constrained by moisture. Sea breeze timing important. NWS LIX accurate. Summer highs very consistent 90-95F."},
-  {code:"KOKC",tz:"America/Chicago",name:"Oklahoma City",climate:"Classic continental location - highest temperature volatility of any major market. Dry line position is critical - can swing forecast 10F+ in either direction. NWS OUN sometimes misses on rapid warm/cool advection. Blue norther passages can drop highs dramatically. Best OVER plays on sustained SW flow."},
-  {code:"KDFW",tz:"America/Chicago",name:"Dallas/Ft Worth",climate:"DFW airport exposure to SW flow is excellent. Urban heat island significant. Dry line dynamics create high forecast uncertainty on convective days. Summer heat dome days (July-Aug) are extremely reliable OVERs - NWS FWD conservative. 100F+ days come in streaks - momentum matters."},
-  {code:"KDAL",tz:"America/Chicago",name:"Dallas (Love Field)",climate:"Urban core location runs 3-5F warmer than DFW on calm nights/mornings. Less exposed to airport wind effects. High temp pacing similar to DFW but slightly warmer on light wind days. Good proxy for urban heat vs airport comparison betting."},
-  {code:"KHOU",tz:"America/Chicago",name:"Houston",climate:"Gulf moisture creates persistent humidity cap on temperatures - rarely exceeds 98F due to moisture. Sea breeze from Galveston Bay influences afternoon temps. Urban heat island significant. NWS HGX reliable. Summer is a LOW VARIANCE market - humidity constrains the range."},
-  {code:"KSAT",tz:"America/Chicago",name:"San Antonio",climate:"Balcones Escarpment to the west creates interesting drainage flow patterns. Gulf moisture influence moderate. More volatile than Houston due to drier air mass potential. Can spike to 105F+ on strong SW flow with dry advection. NWS EWX can underforecast on exceptional heat days."},
-  {code:"KAUS",tz:"America/Chicago",name:"Austin",climate:"Hill Country location slightly elevated. Growing urban heat island. Transitional zone between Gulf moisture and dry continental air - creates high variance. Cap/convergence zone nearby adds convective uncertainty. Strong OVER candidate on dry W/SW flow days. Watch moisture return timing."},
-  {code:"KDEN",tz:"America/Denver",name:"Denver",climate:"Mile-high elevation (5280ft) means temperatures run 15-20F lower than sea-level equivalents. Chinook winds can drive rapid warming - 20-30F rises possible in hours. Upslope flow suppresses highs dramatically. NWS BOU handles chinook well but upslope days have high uncertainty. Wind direction from W = warm, E = cold suppressed."},
-  {code:"KBKF",tz:"America/Denver",name:"Aurora (Buckley)",climate:"Slightly lower elevation than Denver proper. Air Force base location means good instrument maintenance. Similar chinook/upslope dynamics as KDEN but slightly more exposed to plains flow. Runs slightly warmer than KDEN on E flow days."},
-  {code:"KPHX",tz:"America/Phoenix",name:"Phoenix",climate:"Desert heat island - world's most extreme urban heat effect. Sky Harbor airport surrounded by asphalt amplifies heat. Monsoon season (Jul-Sep) is critical: moisture arrival CAPS highs at 100-105F vs dry season 110-118F potential. NWS PSR very accurate for dry conditions, monsoon onset timing is key uncertainty. Pre-monsoon (May-Jun) highest OVER potential."},
-  {code:"KLAS",tz:"America/Los_Angeles",name:"Las Vegas",climate:"Desert basin with strong thermal low development. Valley location traps heat. NWS VEF tends to be accurate but can underforecast on persistent ridge days. Summer highs extremely consistent 105-115F range in core summer. Spring/fall have highest variance. Watch for Pacific systems that can dramatically undercut forecasts."},
-  {code:"KLAX",tz:"America/Los_Angeles",name:"Los Angeles",climate:"Marine layer is THE dominant factor - everything else is secondary. Morning marine layer burns off between 10am-1pm - burn-off timing determines the high. Late burn-off = UNDER, early burn-off = OVER. Coastal station so highs more suppressed than inland (KBUR would be warmer). NWS LOX conservative - frequent OVER opportunities on offshore flow (Santa Ana) days."},
-  {code:"KSFO",tz:"America/Los_Angeles",name:"San Francisco",climate:"Strongest marine influence of any major station. Afternoon onshore flow through Golden Gate keeps summer highs 55-65F while inland valleys hit 100F. Fog burn-off pattern similar to LAX but more persistent. High temp betting at SFO is almost entirely about marine layer - extremely low variance in summer. Most reliable UNDER station in the network."},
-  {code:"KSEA",tz:"America/Los_Angeles",name:"Seattle",climate:"Marine influence significant but less extreme than SFO. Summer heat waves (rare) are the highest-edge plays - NWS dramatically underforecasts when 850mb temps exceed climatology by 10C+. Normal summer days very consistent 65-75F. Watch for offshore flow patterns that eliminate marine influence - those are the 90F+ days."},
+  {code:"KLAX",tz:"America/Los_Angeles",name:"Los Angeles",climate:"Marine layer is THE dominant factor. Burn-off timing (10am-1pm) determines the high. Late burn-off = UNDER, early = OVER. WIND CAP RULE: When winds turn WESTERLY (240-300 deg) at 7+ mph, heating stalls and temp caps near current reading — this is the single strongest UNDER signal at LAX. Offshore/easterly flow (50-120 deg) = no marine influence = OVER. NWS LOX conservative on offshore flow days. Santa Ana events (NE 30-120 deg, low dew point) can spike 10-15F above forecast."},
+  {code:"KATL",tz:"America/New_York",name:"Atlanta",climate:"Elevated terrain (1050ft) means highs run 3-5F lower than surrounding lowlands. WIND CAP RULE: N/NE flow (330-60 deg) brings cooler continental air that caps heating 4-7F below forecast. SW flow is the heating driver — expect OVER on sustained SW. Afternoon convection (Jun-Aug) frequently ends pacing before peak — high often set pre-noon. NWS FFC reliable."},
+  {code:"KAUS",tz:"America/Chicago",name:"Austin",climate:"Transitional zone between Gulf moisture and dry continental air — high variance market. WIND CAP RULE: SE/S flow (120-200 deg) brings Gulf moisture that caps temps 5-8F via humidity dampening. Dry W/SW flow (220-280 deg) = strong OVER candidate — desert mixing reaches the station. Cap/convergence adds convective uncertainty. Growing urban heat island."},
+  {code:"KBOS",tz:"America/New_York",name:"Boston",climate:"Strong marine influence — sea breeze frequently caps summer highs 8-12F below inland. WIND CAP RULE: NE/E/SE onshore flow (30-150 deg) is a HARD CAP — temps plateau 8-12F below model consensus once sea breeze establishes, typically by noon. SW/W flow (200-280 deg) = continental air, no marine cap = OVER bias. NWS BOS historically conservative on summer highs."},
+  {code:"KCLT",tz:"America/New_York",name:"Charlotte",climate:"Piedmont location buffers coastal marine influence. WIND CAP RULE: NW flow (290-340 deg) brings cooler Appalachian-modified air that suppresses highs 3-6F. SW flow best for heating. Afternoon thunderstorm threat (Jun-Aug) can abruptly end pacing — if convection initiates before 2pm, high is likely already set. NWS GSP generally accurate."},
+  {code:"KMDW",tz:"America/Chicago",name:"Chicago (Midway)",climate:"Urban SW Chicago runs 2-4F warmer than KORD. WIND CAP RULE: NE/E/SE flow (30-150 deg) = Lake Michigan air advection = HARD CAP 8-14F below inland forecast. SW/W flow (210-280 deg) eliminates lake influence entirely = OVER bias. Wind direction is the single most important variable — check 925mb winds. More continental than KORD."},
+  {code:"KDFW",tz:"America/Chicago",name:"Dallas/Ft Worth",climate:"Excellent SW flow exposure. Urban heat island significant. WIND CAP RULE: N/NE flow (330-60 deg) post-frontal can suppress highs 8-15F dramatically. S/SW flow (160-240 deg) = dry-line heating = OVER. Dry line position creates high forecast uncertainty on convective days. Summer heat dome days (Jul-Aug) extremely reliable OVERs — NWS FWD conservative. 100F+ days come in streaks."},
+  {code:"KDCA",tz:"America/New_York",name:"Washington D.C.",climate:"Potomac location creates humidity trap. One of the strongest urban heat islands. WIND CAP RULE: NE/E flow (30-120 deg) brings marine air from Chesapeake/Atlantic that caps highs 5-8F below inland. SW flow (200-250 deg) = strongest heating setup = OVER. NWS WBC often conservative. 850mb temps critical — every 1C above normal adds ~1.5F to surface max."},
+  {code:"KDTW",tz:"America/Detroit",name:"Detroit",climate:"Great Lakes influence moderate. WIND CAP RULE: NE/E flow (30-120 deg) can advect Lake Erie/Huron cool air — cap effect 4-8F on strong onshore days. SW/W flow (200-270 deg) = continental heating = OVER setup. Urban heat island significant. NWS DTX generally reliable. More volatile than Chicago due to less direct lake exposure."},
+  {code:"KHOU",tz:"America/Chicago",name:"Houston",climate:"Gulf moisture creates persistent humidity cap. WIND CAP RULE: SE/S onshore flow (120-200 deg) maximizes Gulf moisture — temps rarely exceed 97F with strong onshore flow regardless of model output. NW/W flow (280-330 deg) = drier air = higher max potential. Sea breeze from Galveston Bay influences afternoons. NWS HGX reliable. Summer LOW VARIANCE market."},
+  {code:"KJAX",tz:"America/New_York",name:"Jacksonville",climate:"Inland enough to reduce coastal marine influence vs Miami. WIND CAP RULE: E/SE onshore flow (90-170 deg) brings Atlantic marine air — sea breeze typically arrives 2-4pm, later than Miami, allowing higher max temps first. W/NW flow (260-330 deg) = maximum heating = OVER bias. More volatile than South Florida — 850mb temps matter significantly."},
+  {code:"KLAS",tz:"America/Los_Angeles",name:"Las Vegas",climate:"Desert basin with strong thermal low. Valley traps heat. WIND CAP RULE: SW/W flow (220-290 deg) can bring marine-modified Pacific air over the Sierra — rare but can suppress highs 8-12F when it occurs. S/SE flow (150-220 deg) = desert recirculation = maximum heating. Summer highs extremely consistent 105-115F. Spring/fall highest variance — watch Pacific systems."},
+  {code:"KMIA",tz:"America/New_York",name:"Miami",climate:"Sea breeze battle between Atlantic and Gulf sides is dominant. WIND CAP RULE: E/SE onshore flow (80-170 deg) means sea breeze arrives by 11am-12pm — high ALWAYS set before it arrives, typically 10-11am. W/NW flow (260-330 deg) delays sea breeze = higher afternoon temps possible. Summer highs extremely consistent 88-92F — very LOW VARIANCE market. Watch dry season (Nov-Apr) for higher spread."},
+  {code:"KMSP",tz:"America/Chicago",name:"Minneapolis",climate:"Deep continental location — no significant water body influence. WIND CAP RULE: N/NE flow (330-70 deg) post-frontal brings Canadian air — can suppress highs 8-15F below prior day. S/SW flow (160-230 deg) = strong heating setup. Spring/fall highest variance. NWS MPX can underforecast on strong ridge days. Winter high temps heavily influenced by snow cover albedo."},
+  {code:"KOKC",tz:"America/Chicago",name:"Oklahoma City",climate:"Highest temperature volatility of any major market. WIND CAP RULE: N/NE flow (330-60 deg) = Blue Norther passages can drop highs 15-25F dramatically and rapidly — biggest UNDER signal in the network. S/SW flow (160-230 deg) = dry-line heating = maximum OVER potential. Dry line position swings forecast 10F+. Best OVER plays on sustained SW flow."},
+  {code:"KPHL",tz:"America/New_York",name:"Philadelphia",climate:"Urban heat corridor. Minimal direct marine influence despite Delaware Bay proximity. WIND CAP RULE: NE/E onshore flow (30-100 deg) can bring marine air from Atlantic — caps highs 4-7F on strong onshore days. SW flow (200-240 deg) = unobstructed continental heating = OVER. NWS PHI often underpredicts highs by 2-4F on 850mb ridge days. One of most reliable OVER stations in summer."},
+  {code:"KPHX",tz:"America/Phoenix",name:"Phoenix",climate:"Desert heat island — most extreme urban heat effect. Sky Harbor asphalt amplifies. WIND CAP RULE: SW/W flow (220-290 deg) from Pacific can bring moisture surge (monsoon wedge) — HARD CAP at 100-105F vs dry season 110-118F potential. SE/S flow (140-200 deg) = monsoon moisture arrival = immediate cap. Pre-monsoon (May-Jun) highest OVER potential with N/NW flow. NWS PSR very accurate dry conditions."},
+  {code:"KSAT",tz:"America/Chicago",name:"San Antonio",climate:"Balcones Escarpment creates drainage flow patterns. WIND CAP RULE: SE/S flow (130-200 deg) = Gulf moisture surge = humidity cap, temps constrained to 92-96F range. W/SW flow (240-290 deg) = dry continental air = OVER setup, can spike to 105F+. More volatile than Houston due to drier air mass potential. NWS EWX can underforecast exceptional heat days."},
+  {code:"KSFO",tz:"America/Los_Angeles",name:"San Francisco",climate:"Strongest marine influence of any station. WIND CAP RULE: W/NW onshore flow (260-330 deg) through Golden Gate is a PERMANENT CAP in summer — temps plateau 58-65F regardless of model output when onshore flow established. E/NE flow (60-120 deg) = rare offshore = OVER play, can reach 80-90F. Fog burn-off pattern similar to LAX but more persistent. Most reliable UNDER station in network."},
+  {code:"KSEA",tz:"America/Los_Angeles",name:"Seattle",climate:"Marine influence significant but less extreme than SFO. WIND CAP RULE: SW/W/NW onshore flow (200-330 deg) = Puget Sound marine air = cap at 65-75F on strong onshore days. E/NE flow (60-120 deg) over Cascades = offshore = heat wave setup, 90F+ possible. NWS SEW dramatically underforecasts rare heat waves when 850mb temps exceed climatology by 10C+. Normal summer very consistent."},
+  {code:"KLGA",tz:"America/New_York",name:"New York (LaGuardia)",climate:"Coastal exposure with runway heat soak effect. WIND CAP RULE: E/SE/S onshore flow (80-180 deg) = Atlantic sea breeze = HARD CAP 6-10F below inland. SW/W flow (210-280 deg) = no marine influence, runway asphalt amplifies = OVER. Generally runs 2-4F warmer than KNYC on light wind days. NWS OKX handles sea breeze well — trust the forecast on onshore days."},
 ];
 const MODELS = ["GFS","HRRR","NBM","NAM","ECMWF-IFS","RAP","SREF","GEFS","CFS","RRFS","HREF","NBM-BC"];
 
@@ -715,8 +708,17 @@ async function runAI(station, liveHigh, wuHigh, obs, obs1min, todayFcst, tomorro
 'Dew Point: '+dewPt+'F | RH: '+rh+'% | Temp-Dew Spread: '+(mtTemp!=null&&dewPt!='N/A'?(mtTemp-parseFloat(dewPt)).toFixed(1):'N/A')+'F\n' +
 'Wind: '+windDir+' '+windSpd+'mph'+(windGust?' Gust '+windGust+'mph':'')+'\n' +
 'Visibility: '+vis+' mi | Altimeter: '+altim+'" | SLP: '+slp+'mb\n\n' +
-'=== AIR MASS CLASSIFICATION ===\n' +
-'Use dew point, temp-dew spread, wind direction, RH, and visibility to classify: marine layer / offshore flow / desert mixing / continental mixing / frontal regime.\n\n' +
+'=== AIR MASS & WIND CAP ANALYSIS ===\n' +
+'1) Classify air mass: marine layer / offshore flow / desert mixing / continental / frontal.\n' +
+'2) WIND CAP GUIDANCE (weighted signal, not a verdict):\n' +
+'   Read the WIND CAP RULE in the station microclimate profile. Compare current wind direction (degrees) to the cap zone.\n' +
+'   If wind is IN cap zone: note as a SUPPRESSION SIGNAL — lean toward lower end of model range, but do NOT treat as absolute.\n' +
+'   Wind caps can break — shifts happen, especially at stations with volatile regimes (OKC, DFW, LAX offshore transitions).\n' +
+'   Weight the cap signal heavier the longer the capping wind has been sustained (check pacing table for persistence).\n' +
+'   A cap that has held for 3+ hours through peak heating window is a much stronger signal than one that just established.\n' +
+'   Always note: what wind shift would BREAK the cap, and how likely is that in the next 2-4 hours?\n' +
+'   If wind is in heating zone: confirm cap not active, but flag if a shift toward cap zone is possible.\n' +
+'3) Calculate heating velocity from obs tape (30min / 1hr / 3hr rate). State if accelerating, steady, decelerating, or plateaued.\n\n' +
 '=== NWS FORECAST ===\n' +
 'Today High: '+(todayFcst&&todayFcst.high!=null?todayFcst.high:'N/A')+'F (v'+(todayFcst?todayFcst.version:'?')+')\n' +
 'Tomorrow High: '+(tomorrowFcst&&tomorrowFcst.high!=null?tomorrowFcst.high:'N/A')+'F (v'+(tomorrowFcst?tomorrowFcst.version:'?')+')\n' +
@@ -916,4 +918,5 @@ setInterval(loadData, 5*60*1000);
 </script>
 </body>
 </html>
+
 
