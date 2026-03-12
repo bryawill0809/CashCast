@@ -704,32 +704,55 @@ async function runAI(station, liveHigh, wuHigh, obs, obs1min, todayFcst, tomorro
 'SCREEN EACH MODEL: compute Model Error = Predicted - Current MT temp. Flag biased outliers (>3F off pacing). Retain 3-6 best performers.\n\n' +
 '=== FULL MODEL PACING TABLE (hours from now) ===\n' +
 pacingTable+'\n\n' +
-'TIME INSTRUCTION: '+timeContext+'\nIf today high is FINAL/SET - state the settled number and pivot entirely to TOMORROW analysis.\n\n' +
-'OUTPUT THE FOLLOWING SECTIONS:\n\n' +
-'## CURRENT CONDITIONS AUDIT\n' +
-'Classify air mass regime. Calculate heating velocity from pacing table (30min/1hr/3hr rate). State if accelerating, steady, decelerating, or topped out.\n\n' +
-'## TODAY HIGH — FINAL OR STILL ACTIVE?\n' +
-'If final: state settled number. If active: apply diurnal curve solver (Early Ramp +8-15F inland/+4-9F coastal, Midday Engine +3-8F/+2-5F, Late Flattening +1-4F/+0-2F, Plateau 0-1F) + thermal runway estimate.\n\n' +
-'## MODEL INTEGRITY SCREEN\n' +
-'List each model, its pacing error vs current MT temp, classification (Truth Teller ±1F / Usable ±3F / Biased >3F / Discard). Weight your forecast accordingly.\n\n' +
-'## BIAS-CORRECTED MODEL HIGHS\n' +
-'For each retained model: Bias Corrected High = Model High - Model Error. Cluster into 2F bands. Flag HIGH PIN RISK if any integer outcome >30% probability.\n\n' +
-'## TOMORROW HIGH — FORENSIC PROJECTION\n' +
-'Synthesize: bias-corrected models + NWS hourly + version drift + microclimate + regime adjustments.\n' +
-'Apply synoptic regime modifier: Ridge/Heat Dome +1-4F | Trough -1-3F | Frontal (timing-dependent) | Zonal (minimal).\n' +
-'State: Most Likely Integer High | Forecast Range | Hard Floor | Hard Ceiling.\n\n' +
-'## INTEGER SETTLEMENT PROBABILITIES\n' +
-'Provide probability table for ±3 integers around your pin. Must sum to 100%. Flag PIN RISK if any single integer >30%.\n\n' +
-'## MARKET PRICING — KALSHI EDGE\n' +
-'For the most likely strike: compute YES >X and NO >X probabilities. State your edge vs fair value. OVER or UNDER — be direct with confidence %.\n\n' +
-'## RISK FLAGS\n' +
-'What invalidates this call? Wind shift timing, marine layer failure, model outlier proving correct, sensor bias.';
+'TIME INSTRUCTION: '+timeContext+'\n'
++ 'If today high is FINAL/SET: confirm the settled number in one line, then devote the rest of the report to TOMORROW.\n'
++ 'If today is still active: analyze today trajectory AND tomorrow.\n\n'
++ '=== CRITICAL FRAMEWORK: TODAY BIAS TRANSFERS TO TOMORROW ===\n'
++ 'The model pacing errors you measure TODAY are the best available signal for correcting TOMORROW projections.\n'
++ 'A model running +4F hot today will likely run +4F hot tomorrow. Apply these measured biases to the tomorrow peak highs.\n'
++ 'As the day progresses, your today data becomes increasingly precise — use it to sharpen the tomorrow projection.\n\n'
++ 'OUTPUT THE FOLLOWING SECTIONS:\n\n'
++ '## CURRENT CONDITIONS AUDIT\n'
++ 'Classify air mass regime (marine layer / offshore flow / desert mixing / continental / frontal).\n'
++ 'Calculate heating velocity: compare model pacing temps at recent hours vs current MT. State if accelerating, steady, decelerating, or topped out.\n\n'
++ '## TODAY HIGH — FINAL OR STILL ACTIVE?\n'
++ 'FINAL: state settled integer and time. Do not speculate further on today.\n'
++ 'ACTIVE: apply diurnal curve solver — remaining heating estimate based on regime:\n'
++ '  Early Ramp (<10am): +8-15F inland / +4-9F coastal remaining\n'
++ '  Midday Engine (10am-1pm): +3-8F inland / +2-5F coastal remaining\n'
++ '  Late Flattening (1-4pm): +1-4F inland / +0-2F coastal remaining\n'
++ '  Plateau/Post-Peak (>4pm): 0-1F, likely done\n'
++ 'Add thermal runway estimate (Dry +6-10F / Mixed +3-6F / Marine +0-3F efficiency).\n\n'
++ '## MODEL INTEGRITY SCREEN — TODAY PACING\n'
++ 'For EACH model in the pacing table, compute: Model Error = Model current-hour temp - Actual MT temp.\n'
++ 'Classify: Truth Teller (±1F) / Usable (±3F) / Biased (>3F) / Discard (physically inconsistent).\n'
++ 'Show a table: Model | Predicted Now | Actual MT | Error | Classification | Weight\n'
++ 'RETAIN only Truth Tellers and Usable models for the tomorrow projection. Discard the rest.\n\n'
++ '## BIAS-CORRECTED TOMORROW PROJECTION\n'
++ 'THIS IS THE PRIMARY DELIVERABLE. Apply today measured biases directly to tomorrow forecasts:\n'
++ '  Bias Corrected Tomorrow High = Model Tomorrow Peak - Model Pacing Error (measured today)\n'
++ 'Show table: Model | Raw Tomorrow High | Pacing Error | Bias-Corrected Tomorrow High | Weight\n'
++ 'Then: cluster bias-corrected highs into 2F bands to form probability cone.\n'
++ 'Apply synoptic regime modifier: Ridge/Heat Dome +1-4F | Trough -1-3F | Frontal (timing-dependent) | Zonal (minimal).\n'
++ 'Apply microclimate adjustment from station profile.\n'
++ 'State final: MOST LIKELY INTEGER | FORECAST RANGE | HARD FLOOR | HARD CEILING.\n\n'
++ '## INTEGER SETTLEMENT PROBABILITIES — TOMORROW\n'
++ 'Probability table for ±3 integers around your pin. Must sum to 100%.\n'
++ 'Example: 82F:8% 83F:19% 84F:35% 85F:24% 86F:10% 87F:4%\n'
++ 'Flag HIGH PIN RISK if any single integer >30% probability.\n'
++ 'Note data confidence level: early-day projection (wider bands) vs late-day (tighter, more today bias data available).\n\n'
++ '## MARKET PRICING — KALSHI EDGE\n'
++ 'State the most likely Kalshi strike. Compute YES >X and NO >X probabilities from your integer table.\n'
++ 'Give your edge: OVER / UNDER / PASS with confidence %.\n'
++ 'Note if confidence is lower due to early-day uncertainty vs high-confidence late-day call.\n\n'
++ '## RISK FLAGS\n'
++ 'What invalidates this call? Be specific: wind shift timing, marine layer behavior, model outlier scenario, sensor bias, synoptic pattern change.';
 
   try {
     const r = await fetch('/.netlify/functions/claude', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:1500, messages:[{role:'user',content:prompt}]})
+      body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:2500, messages:[{role:'user',content:prompt}]})
     });
     const d = await r.json();
     console.log('Claude status:', r.status, JSON.stringify(d).slice(0,150));
@@ -810,4 +833,3 @@ setInterval(loadData, 5*60*1000);
 </script>
 </body>
 </html>
-
