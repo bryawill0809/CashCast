@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#07090d">
-<title>StormEdge</title>
+<title>CashCast</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Share+Tech+Mono&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{background:#07090d;color:#d0dde8;font-family:'Barlow',sans-serif;min-height:100vh}
+html,body{background:#07090d;color:#e8f0f8;font-family:'Barlow',sans-serif;min-height:100vh}
 :root{
   --acid:#00ffc8;--fire:#ff5533;--gold:#ffcb47;--ice:#5bc8ff;
   --bg:#07090d;--s1:#0d1520;--s2:#111c2a;
-  --bd:rgba(0,255,200,0.12);--mut:#5a7a94;--dim:#4da6ff;
+  --bd:rgba(0,255,200,0.12);--mut:#4da6ff;--dim:#4da6ff;
   --mono:'Share Tech Mono',monospace;--cond:'Barlow Condensed',sans-serif;
 }
 @keyframes glow{0%,100%{text-shadow:0 0 20px rgba(0,255,200,.3)}50%{text-shadow:0 0 50px rgba(0,255,200,.8)}}
@@ -28,7 +28,7 @@ html,body{background:#07090d;color:#d0dde8;font-family:'Barlow',sans-serif;min-h
 .logo{font-family:var(--cond);font-weight:900;font-size:30px;letter-spacing:3px;color:var(--acid);text-shadow:0 0 24px rgba(0,255,200,.2)}
 .logo em{color:var(--fire);font-style:normal}
 .hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.update-time{font-family:var(--mono);font-size:9px;color:var(--mut);letter-spacing:1px}
+.update-time{font-family:var(--mono);font-size:10px;color:#4da6ff;letter-spacing:1px}
 .btn{background:none;border:1px solid var(--bd);color:var(--acid);padding:7px 14px;font-family:var(--mono);font-size:10px;letter-spacing:1px;cursor:pointer;transition:all .2s}
 .btn:hover{background:rgba(0,255,200,.06);border-color:var(--acid)}
 .btn:disabled{opacity:.3;cursor:not-allowed}
@@ -53,7 +53,7 @@ html,body{background:#07090d;color:#d0dde8;font-family:'Barlow',sans-serif;min-h
 .stat.acid::after{background:linear-gradient(90deg,var(--acid),transparent)}
 .stat.fire::after{background:linear-gradient(90deg,var(--fire),transparent)}
 .stat.gold::after{background:linear-gradient(90deg,var(--gold),transparent)}
-.stat-label{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--mut);text-transform:uppercase;margin-bottom:8px}
+.stat-label{font-family:var(--mono);font-size:10px;color:#4da6ff;letter-spacing:3px;color:#4da6ff;text-transform:uppercase;margin-bottom:8px}
 .stat-val{font-family:var(--cond);font-weight:900;line-height:1}
 .stat-big{font-size:64px}
 .stat-med{font-size:50px}
@@ -64,7 +64,7 @@ html,body{background:#07090d;color:#d0dde8;font-family:'Barlow',sans-serif;min-h
 .bet-banner{background:var(--s2);border:1px solid var(--bd);padding:16px 20px;margin-bottom:12px;display:grid;grid-template-columns:auto auto auto 1fr;gap:24px;align-items:center;position:relative;overflow:hidden}
 .bet-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--acid),var(--fire),transparent)}
 @media(max-width:600px){.bet-banner{grid-template-columns:1fr 1fr;gap:14px}}
-.bb-label{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--mut);text-transform:uppercase;margin-bottom:5px}
+.bb-label{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:#4da6ff;text-transform:uppercase;margin-bottom:5px}
 .bb-val{font-family:var(--cond);font-weight:900;font-size:28px}
 .bet-pill{font-family:var(--cond);font-weight:900;font-size:20px;letter-spacing:2px;padding:5px 14px;border:2px solid;display:inline-block}
 .bet-pill.over{color:#00e676;border-color:#00e676;background:rgba(0,230,118,.08)}
@@ -77,23 +77,23 @@ html,body{background:#07090d;color:#d0dde8;font-family:'Barlow',sans-serif;min-h
 .models{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
 @media(max-width:600px){.models{grid-template-columns:repeat(3,1fr)}}
 .model-box{background:var(--s1);border:1px solid var(--bd);padding:12px 8px;text-align:center}
-.model-name{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--mut);margin-bottom:5px}
+.model-name{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:#4da6ff;margin-bottom:5px}
 .model-val{font-family:var(--cond);font-weight:900;font-size:26px}
 
 /* HOURLY */
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
 @media(max-width:600px){.two-col{grid-template-columns:1fr}}
 .panel{background:var(--s1);border:1px solid var(--bd);padding:16px 18px}
-.panel-label{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--mut);text-transform:uppercase;margin-bottom:12px}
+.panel-label{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:#4da6ff;text-transform:uppercase;margin-bottom:12px}
 .h-bars{display:flex;align-items:flex-end;gap:3px;height:72px}
 .h-bar{flex:1;border-radius:1px 1px 0 0;min-width:0}
 .h-labels{display:flex;gap:3px;margin-top:4px}
-.h-label{flex:1;font-family:var(--mono);font-size:7px;color:var(--mut);text-align:center;min-width:0;overflow:hidden}
+.h-label{flex:1;font-family:var(--mono);font-size:9px;color:#4da6ff;text-align:center;min-width:0;overflow:hidden}
 
 /* DRIFT */
 .drift{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 .drift-item{background:var(--s1);border:1px solid var(--bd);padding:9px 12px;text-align:center;min-width:54px}
-.drift-v{font-family:var(--mono);font-size:8px;color:var(--mut);margin-bottom:2px}
+.drift-v{font-family:var(--mono);font-size:9px;color:#4da6ff;margin-bottom:2px}
 .drift-h{font-family:var(--cond);font-weight:900;font-size:22px}
 
 /* ANALYSIS */
@@ -101,9 +101,9 @@ html,body{background:#07090d;color:#d0dde8;font-family:'Barlow',sans-serif;min-h
 .analysis-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
 .a-badge{background:var(--acid);color:#000;font-family:var(--mono);font-size:9px;letter-spacing:2px;padding:3px 8px;font-weight:700}
 .a-title{font-family:var(--cond);font-size:17px;font-weight:700;letter-spacing:2px}
-.analysis-body{font-size:14px;line-height:1.9;color:var(--dim)}
-.analysis-body h2{font-family:var(--cond);font-size:13px;font-weight:700;letter-spacing:2px;color:#cdd9e3;margin:14px 0 4px;text-transform:uppercase;border-left:3px solid var(--acid);padding-left:8px}
-.loading{animation:pulse 1.6s ease-in-out infinite;font-family:var(--mono);font-size:11px;color:var(--mut)}
+.analysis-body{font-size:14px;line-height:1.9;color:#c8dff0}
+.analysis-body h2{font-family:var(--cond);font-size:13px;font-weight:700;letter-spacing:2px;color:#e0ecf8;margin:14px 0 4px;text-transform:uppercase;border-left:3px solid var(--acid);padding-left:8px}
+.loading{animation:pulse 1.6s ease-in-out infinite;font-family:var(--mono);font-size:11px;color:#4da6ff}
 .error-box{background:rgba(255,85,51,.07);border:1px solid rgba(255,85,51,.2);color:#ff9999;padding:12px 16px;font-family:var(--mono);font-size:11px;margin-bottom:12px}
 .prob-row{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px}
 .prob-temp{width:32px;color:#fff;text-align:right;flex-shrink:0}
@@ -111,16 +111,16 @@ html,body{background:#07090d;color:#d0dde8;font-family:'Barlow',sans-serif;min-h
 .prob-bar-fill{height:100%;border-radius:2px;transition:width .4s ease}
 .prob-pct{width:36px;text-align:right;flex-shrink:0;color:#4da6ff}
 .warn-box{background:rgba(255,203,71,.07);border:1px solid rgba(255,203,71,.2);color:var(--gold);padding:12px 16px;font-family:var(--mono);font-size:11px;margin-bottom:12px}
-.footer{font-family:var(--mono);font-size:9px;color:var(--mut);text-align:center;padding-top:14px;border-top:1px solid var(--bd);letter-spacing:1px}
+.footer{font-family:var(--mono);font-size:10px;color:#4da6ff;text-align:center;padding-top:14px;border-top:1px solid var(--bd);letter-spacing:1px}
 .spin{display:inline-block;animation:spin 1s linear infinite}
 .cond-item{background:var(--s1);border:1px solid var(--bd);padding:10px 12px;}
-.cond-label{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--mut);text-transform:uppercase;margin-bottom:4px}
+.cond-label{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:#4da6ff;text-transform:uppercase;margin-bottom:4px}
 .cond-val{font-family:var(--cond);font-weight:700;font-size:20px;color:#fff}
 .cond-sub{font-family:var(--mono);font-size:11px;color:#4da6ff;margin-top:3px}
 .obs-badge{display:inline-block;font-family:var(--mono);font-size:8px;padding:1px 5px;margin-left:4px;vertical-align:middle}
 .obs-mt{background:rgba(0,255,200,.12);color:var(--acid);border:1px solid rgba(0,255,200,.2)}
 .obs-1m{background:rgba(91,200,255,.1);color:var(--ice);border:1px solid rgba(91,200,255,.2)}
-.section-head{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--mut);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.section-head{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:#4da6ff;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .section-head::after{content:'';flex:1;height:1px;background:var(--bd)}
 </style>
 </head>
@@ -139,8 +139,8 @@ html,body{background:#07090d;color:#d0dde8;font-family:'Barlow',sans-serif;min-h
   <!-- STATION PICKER -->
   <div class="station-wrap">
     <button class="station-btn" onclick="togglePicker()">
-      <span id="station-name">New York (Central Park)</span>
-      <span class="station-code" id="station-code">KNYC &#9660;</span>
+      <span id="station-name">Los Angeles</span>
+      <span class="station-code" id="station-code">KLAX &#9660;</span>
     </button>
     <div class="station-drop" id="station-drop">
       <input class="station-search" placeholder="Search&hellip;" oninput="filterStations(this.value)">
@@ -788,7 +788,7 @@ pacingTable+'\n\n' +
     const text = d.content ? d.content.map(b=>b.text||'').join('\n') : '';
     const html = text
       .replace(/## (.+)/g,'<h2>$1</h2>')
-      .replace(/\*\*(.+?)\*\*/g,'<strong style="color:#cdd9e3">$1</strong>')
+      .replace(/\*\*(.+?)\*\*/g,'<strong style="color:#e0ecf8">$1</strong>')
       .replace(/\n/g,'<br>');
     setHTML('analysis-body', html);
     el('analysis-body').className = 'analysis-body';
@@ -867,7 +867,7 @@ pacingTable+'\n\n' +
             return '<div class="prob-row">' +
               '<div class="prob-temp" style="color:' + (isPin?'var(--gold)':'#fff') + '">' + row.t + '°</div>' +
               '<div class="prob-bar-wrap"><div class="prob-bar-fill" style="width:' + widthPct + '%;background:' + barColor + '"></div></div>' +
-              '<div class="prob-pct">' + row.p + '%</div>' +
+              '<div class="prob-pct" style="color:#4da6ff">' + row.p + '%</div>' +
             '</div>';
           }).join('');
 
@@ -892,7 +892,7 @@ pacingTable+'\n\n' +
               return '<div class="prob-row">' +
                 '<div class="prob-temp" style="color:' + (isPin?'var(--fire)':'#fff') + '">' + row.t + '°</div>' +
                 '<div class="prob-bar-wrap"><div class="prob-bar-fill" style="width:' + widthPct + '%;background:' + barColor + '"></div></div>' +
-                '<div class="prob-pct">' + row.p + '%</div>' +
+                '<div class="prob-pct" style="color:#4da6ff">' + row.p + '%</div>' +
               '</div>';
             }).join('');
           }
@@ -918,5 +918,6 @@ setInterval(loadData, 5*60*1000);
 </script>
 </body>
 </html>
+
 
 
