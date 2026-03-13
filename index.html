@@ -830,10 +830,17 @@ pacingTable+'\n\n' +
 + 'RETAIN only Truth Tellers and Usable models for the tomorrow projection. Discard the rest.\n\n'
 + '## BIAS-CORRECTED TOMORROW PROJECTION\n'
 + 'THIS IS THE PRIMARY DELIVERABLE. Apply today measured biases directly to tomorrow forecasts:\n'
-+ '  Bias Corrected Tomorrow High = Model Tomorrow Peak - Model Pacing Error (measured today)\n'
++ '  Bias Corrected Tomorrow High = Model Raw Tomorrow Peak - Model Pacing Error (measured today or overnight)\n'
 + 'Show table: Model | Raw Tomorrow High | Pacing Error | Bias-Corrected Tomorrow High | Weight\n'
-+ 'Then: cluster bias-corrected highs into 2F bands to form probability cone.\n'
-+ 'Apply synoptic regime modifier: Ridge/Heat Dome +1-4F | Trough -1-3F | Frontal (timing-dependent) | Zonal (minimal).\n'
++ 'CRITICAL ANCHOR RULE: The NWS human forecast (tomorrow high) must be treated as a HIGH-WEIGHT anchor.\n'
++ '  NWS forecasters have local knowledge, sounding data, and pattern recognition that raw models miss.\n'
++ '  If bias-corrected model cluster deviates more than 4F from NWS forecast, investigate WHY before dismissing NWS.\n'
++ '  GFS and RAP are known to run cold at coastal stations (KLAX, KSFO, KSEA) — do not over-weight them.\n'
++ '  NBM is often the best blend and should get highest weight when it verifies overnight pacing well.\n'
++ 'WU RUNNING HIGH RULE: The WU running high is the most real-time settlement proxy available.\n'
++ '  If WU high > NWS DSM high → actual settlement likely tracks WU, not NWS official.\n'
++ '  Weight WU as primary settlement reference over NWS DSM for final high projection.\n'
++ 'Then: cluster bias-corrected highs into 2F bands. Apply synoptic regime modifier.\n'
 + 'Apply microclimate adjustment from station profile.\n'
 + 'State final: MOST LIKELY INTEGER | FORECAST RANGE | HARD FLOOR | HARD CEILING.\n\n'
 + '## INTEGER SETTLEMENT PROBABILITIES — TOMORROW\n'
@@ -874,13 +881,14 @@ pacingTable+'\n\n' +
 'WU High: '+(wuHigh&&wuHigh.wethr_high?wuHigh.wethr_high:'?')+'F | NWS: '+(liveHigh&&liveHigh.wethr_high?liveHigh.wethr_high:'?')+'F | MT: '+(mtTemp!=null?mtTemp:'?')+'F\n' +
 'Today NWS: '+(todayFcst&&todayFcst.high?todayFcst.high:'?')+'F | Tomorrow NWS: '+(tomorrowFcst&&tomorrowFcst.high?tomorrowFcst.high:'?')+'F\n' +
 'Models Mean: '+(modelMean||'?')+'F | Spread: '+(modelSpread||'?')+'F\n\n' +
-'Extract from your report above and output ONLY this JSON (numbers must match your report exactly):\n' +
+'CRITICAL: The integerProbs object MUST contain actual percentage numbers (e.g. 25), not 0 or null.\n'
++ 'Extract from your report above and output ONLY this JSON (numbers must match your report exactly):\n' +
 '{"tomorrowProjectedHigh":integer,"tomorrowRangeLow":integer,"tomorrowRangeHigh":integer,"hardFloor":integer,"hardCeiling":integer,"tomorrowConfidence":integer,"pinRisk":boolean,"integerProbs":{"minus2":number,"minus1":number,"pin":number,"plus1":number,"plus2":number},"trendDirection":"UP|DOWN|FLAT","betSide":"OVER|UNDER|PASS","betEdge":"STRONG|MODERATE|WEAK","betNote":"one sentence max 15 words"}';
 
     const br = await fetch('/.netlify/functions/claude', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({model:'claude-haiku-4-5-20251001', max_tokens:600, messages:[{role:'user',content:betPrompt}]})
+      body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:600, messages:[{role:'user',content:betPrompt}]})
     });
     const bd = await br.json();
     if(!bd.error && bd.content){
