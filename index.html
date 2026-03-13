@@ -644,7 +644,7 @@ async function loadData(){
           const pacing = pts.map(d=>{
             const hr = Math.round((new Date(d.valid_time)-now)/3600000);
             return [hr, Math.round(d.temperature_f)];
-          }).filter(p=>p[0]>=0 && p[0]<=30);
+          }).filter(p=>p[0]>=0 && p[0]<=18);
           modelForecasts.push({model:MODELS[i], high, pacing});
         }
       }
@@ -664,7 +664,7 @@ async function loadData(){
     }
 
     // \u2500\u2500 TIMESTAMP \u2500\u2500
-    setText('update-time', 'UPDATED ' + new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) + ' \u00B7 AUTO 5MIN');
+    setText('update-time', 'UPDATED ' + new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
 
     // Warn if data missing
     if(!latestObs && !liveHigh && !todayFcst){
@@ -720,10 +720,14 @@ async function runAI(station, liveHigh, wuHigh, obs, obs1min, todayFcst, tomorro
   // Pacing table
   let pacingTable = 'N/A';
   if(models.length > 0){
-    const allHours = [...new Set(models.flatMap(m=>m.pacing.map(p=>p[0])))].sort((a,b)=>a-b);
+    // Every 2hrs to reduce tokens while preserving trend shape
+    const allHours = [...new Set(models.flatMap(m=>m.pacing.map(p=>p[0])))].sort((a,b)=>a-b).filter(h=>h>=0);
     const header = 'HR  | ' + models.map(m=>m.model.padEnd(10)).join(' | ');
     const rows = allHours.map(hr=>{
-      const vals = models.map(m=>{ const pt=m.pacing.find(p=>p[0]===hr); return pt?String(pt[1]).padEnd(10):'?'.padEnd(10); });
+      const vals = models.map(m=>{
+        const pt = m.pacing.find(p=>p[0]===hr) || m.pacing.find(p=>p[0]===hr+1);
+        return pt?String(pt[1]).padEnd(10):'?'.padEnd(10);
+      });
       return String(hr).padStart(3)+' | '+vals.join(' | ');
     });
     pacingTable = header+'\n'+rows.join('\n');
@@ -776,8 +780,8 @@ async function runAI(station, liveHigh, wuHigh, obs, obs1min, todayFcst, tomorro
 '=== NWS FORECAST ===\n' +
 'Today High: '+(todayFcst&&todayFcst.high!=null?todayFcst.high:'N/A')+'F (v'+(todayFcst?todayFcst.version:'?')+')\n' +
 'Tomorrow High: '+(tomorrowFcst&&tomorrowFcst.high!=null?tomorrowFcst.high:'N/A')+'F (v'+(tomorrowFcst?tomorrowFcst.version:'?')+')\n' +
-'Today Hourly: '+(todayFcst&&todayFcst.hourly_temps?todayFcst.hourly_temps.map((t,i)=>i+'h:'+t+'F').filter(s=>!s.includes('null')).join(' '):'N/A')+'\n' +
-'Tomorrow Hourly: '+(tomorrowFcst&&tomorrowFcst.hourly_temps?tomorrowFcst.hourly_temps.map((t,i)=>i+'h:'+t+'F').filter(s=>!s.includes('null')).join(' '):'N/A')+'\n\n' +
+'Today Hourly: '+(todayFcst&&todayFcst.hourly_temps?todayFcst.hourly_temps.map((t,i)=>i+'h:'+t+'F').filter((s,i)=>i>=6&&i<=24&&!s.includes('null')).join(' '):'N/A')+'\n' +
+'Tomorrow Hourly: '+(tomorrowFcst&&tomorrowFcst.hourly_temps?tomorrowFcst.hourly_temps.map((t,i)=>i+'h:'+t+'F').filter((s,i)=>i>=6&&i<=24&&!s.includes('null')).join(' '):'N/A')+'\n\n' +
 '=== FORECAST VERSION DRIFT ===\n' +
 (histVer?histVer.map(v=>'v'+v.v+':'+v.high+'F').join(' -> '):'N/A')+'\n\n' +
 '=== MODEL INTEGRITY BOARD ===\n' +
@@ -862,7 +866,7 @@ pacingTable+'\n\n' +
     const br = await fetch('/.netlify/functions/claude', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:600, messages:[{role:'user',content:betPrompt}]})
+      body: JSON.stringify({model:'claude-haiku-4-5-20251001', max_tokens:600, messages:[{role:'user',content:betPrompt}]})
     });
     const bd = await br.json();
     if(!bd.error && bd.content){
@@ -969,7 +973,7 @@ pacingTable+'\n\n' +
 // INIT
 buildStationList('');
 // loadData() is called by gate after auth;
-setInterval(loadData, 5*60*1000);
+// setInterval(loadData, 5*60*1000); // Auto-refresh off by default — use REFRESH button to control costs
 </script>
 </body>
 </html>
