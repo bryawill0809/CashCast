@@ -2,1006 +2,672 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#07090d">
-<title>CashCast</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Share+Tech+Mono&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wethr.net Station Snapshot</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{background:#07090d;color:#e8f0f8;font-family:'Barlow',sans-serif;min-height:100vh}
-:root{
-  --acid:#00ffc8;--fire:#ff5533;--gold:#ffcb47;--ice:#5bc8ff;
-  --bg:#07090d;--s1:#0d1520;--s2:#111c2a;
-  --bd:rgba(0,255,200,0.12);--mut:#4da6ff;--dim:#4da6ff;
-  --mono:'Share Tech Mono',monospace;--cond:'Barlow Condensed',sans-serif;
-}
-@keyframes glow{0%,100%{text-shadow:0 0 20px rgba(0,255,200,.3)}50%{text-shadow:0 0 50px rgba(0,255,200,.8)}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-@keyframes spin{to{transform:rotate(360deg)}}
+  :root {
+    --bg: #0a0e17; --surface: #111827; --surface2: #1a2235; --border: #1e2d45;
+    --accent: #00d4ff; --accent2: #ff6b35; --green: #00ff9d; --text: #e2e8f0;
+    --muted: #64748b; --danger: #ff4757; --yellow: #ffd166; --purple: #a78bfa;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px; pointer-events: none; z-index: 0;
+  }
+  .container { position: relative; z-index: 1; max-width: 980px; margin: 0 auto; padding: 40px 24px 80px; }
+  header { margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 24px; }
+  .logo-row { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;box-shadow:0 0 12px var(--accent);}50%{opacity:0.6;box-shadow:0 0 6px var(--accent);} }
+  h1 { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.5px; color: #fff; }
+  h1 span { color: var(--accent); }
+  .subtitle { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
 
-/* LAYOUT */
-.wrap{max-width:1100px;margin:0 auto;padding:22px 16px}
+  .config-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+  .config-panel h2 { font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .field select { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; outline: none; transition: border-color 0.2s; width: 100%; appearance: none; -webkit-appearance: none; }
+  .field select:focus { border-color: var(--accent); }
+  .field select option { background: var(--surface); color: var(--text); }
+  .select-wrapper { position: relative; }
+  .select-wrapper::after { content: '▾'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--accent); pointer-events: none; font-size: 0.9rem; }
 
-/* HEADER */
-.hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid var(--bd);margin-bottom:18px}
-.logo{font-family:var(--cond);font-weight:900;font-size:30px;letter-spacing:3px;color:var(--acid);text-shadow:0 0 24px rgba(0,255,200,.2)}
-.logo em{color:var(--fire);font-style:normal}
-.hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.update-time{font-family:var(--mono);font-size:10px;color:#4da6ff;letter-spacing:1px}
-.btn{background:none;border:1px solid var(--bd);color:var(--acid);padding:7px 14px;font-family:var(--mono);font-size:10px;letter-spacing:1px;cursor:pointer;transition:all .2s}
-.btn:hover{background:rgba(0,255,200,.06);border-color:var(--acid)}
-.btn:disabled{opacity:.3;cursor:not-allowed}
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+  .fetch-btn { width: 100%; padding: 14px 24px; background: transparent; border: 1px solid var(--accent); border-radius: 8px; color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .fetch-btn:hover { background: rgba(0,212,255,0.08); box-shadow: 0 0 20px rgba(0,212,255,0.15); }
+  .fetch-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .fetch-btn.tmrw { border-color: var(--purple); color: var(--purple); }
+  .fetch-btn.tmrw:hover { background: rgba(167,139,250,0.08); box-shadow: 0 0 20px rgba(167,139,250,0.15); }
+  .fetch-btn .spinner { width: 13px; height: 13px; border: 2px solid rgba(0,212,255,0.3); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+  .fetch-btn.tmrw .spinner { border-color: rgba(167,139,250,0.3); border-top-color: var(--purple); }
+  .fetch-btn.loading .spinner { display: block; }
+  .fetch-btn.loading .btn-text { opacity: 0.6; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-/* STATION */
-.station-wrap{position:relative;margin-bottom:16px}
-.station-btn{width:100%;background:var(--s1);border:1px solid var(--bd);color:#fff;padding:13px 18px;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:var(--cond);font-size:18px;font-weight:700;letter-spacing:1px;transition:border-color .2s}
-.station-btn:hover{border-color:var(--acid)}
-.station-code{font-family:var(--mono);font-size:11px;color:var(--acid)}
-.station-drop{position:absolute;top:100%;left:0;right:0;background:#0c1929;border:1px solid var(--acid);z-index:9999;max-height:320px;overflow-y:auto;display:none}
-.station-drop.open{display:block}
-.station-search{width:100%;background:var(--bg);border:none;border-bottom:1px solid var(--bd);color:#fff;padding:10px 14px;font-family:var(--mono);font-size:12px;outline:none}
-.station-item{padding:11px 16px;display:flex;justify-content:space-between;cursor:pointer;font-size:13px;border-bottom:1px solid rgba(255,255,255,.03);transition:background .15s}
-.station-item:hover,.station-item.active{background:rgba(0,255,200,.07)}
-.station-item-code{font-family:var(--mono);font-size:10px;color:var(--acid)}
+  .status-bar { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--muted); padding: 10px 0; min-height: 30px; }
+  .status-bar.error { color: var(--danger); }
+  .status-bar.success { color: var(--green); }
 
-/* STATS */
-.stats{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-bottom:12px}
-@media(max-width:600px){.stats{grid-template-columns:1fr 1fr;} .stat-main{grid-column:1/-1}}
-.stat{background:var(--s1);border:1px solid var(--bd);padding:18px 20px;position:relative;overflow:hidden}
-.stat::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px}
-.stat.acid::after{background:linear-gradient(90deg,var(--acid),transparent)}
-.stat.fire::after{background:linear-gradient(90deg,var(--fire),transparent)}
-.stat.gold::after{background:linear-gradient(90deg,var(--gold),transparent)}
-.stat-label{font-family:var(--mono);font-size:10px;color:#4da6ff;letter-spacing:3px;color:#4da6ff;text-transform:uppercase;margin-bottom:8px}
-.stat-val{font-family:var(--cond);font-weight:900;line-height:1}
-.stat-big{font-size:64px}
-.stat-med{font-size:50px}
-.stat-info{font-family:var(--mono);font-size:11px;color:#4da6ff;margin-top:6px}
-.chip{display:inline-block;background:rgba(0,255,200,.08);border:1px solid var(--bd);color:var(--acid);font-family:var(--mono);font-size:9px;padding:2px 8px;letter-spacing:1px;margin-top:8px}
+  .day-section { display: none; flex-direction: column; gap: 16px; margin-bottom: 32px; }
+  .day-section.visible { display: flex; }
+  .day-label { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; padding: 6px 0 10px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+  .day-label.today { color: var(--accent); }
+  .day-label.tomorrow { color: var(--purple); }
 
-/* BET BANNER */
-.bet-banner{background:var(--s2);border:1px solid var(--bd);padding:16px 20px;margin-bottom:12px;display:grid;grid-template-columns:auto auto auto 1fr;gap:24px;align-items:center;position:relative;overflow:hidden}
-.bet-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--acid),var(--fire),transparent)}
-@media(max-width:600px){.bet-banner{grid-template-columns:1fr 1fr;gap:14px}}
-.bb-label{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:#4da6ff;text-transform:uppercase;margin-bottom:5px}
-.bb-val{font-family:var(--cond);font-weight:900;font-size:28px}
-.bet-pill{font-family:var(--cond);font-weight:900;font-size:20px;letter-spacing:2px;padding:5px 14px;border:2px solid;display:inline-block}
-.bet-pill.over{color:#00e676;border-color:#00e676;background:rgba(0,230,118,.08)}
-.bet-pill.under{color:var(--fire);border-color:var(--fire);background:rgba(255,85,51,.08)}
-.bet-pill.pass{color:var(--gold);border-color:var(--gold);background:rgba(255,203,71,.08)}
-.conf-bar{height:3px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:6px;overflow:hidden}
-.conf-fill{height:100%;border-radius:2px;transition:width 1s ease}
+  .data-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); background: var(--surface2); }
+  .card-title { font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+  .card-title.tmrw-title { color: var(--purple); }
+  .record-count { font-size: 0.65rem; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); border-radius: 4px; padding: 2px 8px; color: var(--accent); }
+  .record-count.tmrw { background: rgba(167,139,250,0.1); border-color: rgba(167,139,250,0.2); color: var(--purple); }
+  .card-body { padding: 16px 18px; max-height: 320px; overflow-y: auto; }
+  .card-body.no-max { max-height: none; }
+  .card-body::-webkit-scrollbar { width: 4px; }
+  .card-body::-webkit-scrollbar-track { background: transparent; }
+  .card-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-/* MODELS */
-.models{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
-@media(max-width:600px){.models{grid-template-columns:repeat(3,1fr)}}
-.model-box{background:var(--s1);border:1px solid var(--bd);padding:12px 8px;text-align:center}
-.model-name{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:#4da6ff;margin-bottom:5px}
-.model-val{font-family:var(--cond);font-weight:900;font-size:26px}
+  .pacing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 12px; }
+  .pacing-item { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .pacing-label { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .pacing-value { font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 700; color: var(--green); }
+  .pacing-value.na { color: var(--muted); font-size: 0.8rem; }
 
-/* HOURLY */
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-@media(max-width:600px){.two-col{grid-template-columns:1fr}}
-.panel{background:var(--s1);border:1px solid var(--bd);padding:16px 18px}
-.panel-label{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:#4da6ff;text-transform:uppercase;margin-bottom:12px}
-.h-bars{display:flex;align-items:flex-end;gap:3px;height:72px}
-.h-bar{flex:1;border-radius:1px 1px 0 0;min-width:0}
-.h-labels{display:flex;gap:3px;margin-top:4px}
-.h-label{flex:1;font-family:var(--mono);font-size:9px;color:#4da6ff;text-align:center;min-width:0;overflow:hidden}
+  .model-table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
+  .model-table th { text-align: left; color: var(--muted); font-weight: 500; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0 12px 10px 0; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .model-table td { padding: 8px 12px 8px 0; border-bottom: 1px solid rgba(30,45,69,0.5); vertical-align: middle; white-space: nowrap; }
+  .model-table tr:last-child td { border-bottom: none; }
+  .m-name { color: var(--accent); font-weight: 700; }
+  .m-name.tmrw { color: var(--purple); }
+  .m-high { color: var(--accent2); font-weight: 700; }
+  .m-time { color: var(--muted); font-size: 0.7rem; }
+  .pace-pos { color: var(--accent); }
+  .pace-neg { color: var(--danger); }
+  .pace-zero { color: var(--yellow); }
 
-/* DRIFT */
-.drift{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.drift-item{background:var(--s1);border:1px solid var(--bd);padding:9px 12px;text-align:center;min-width:54px}
-.drift-v{font-family:var(--mono);font-size:9px;color:#4da6ff;margin-bottom:2px}
-.drift-h{font-family:var(--cond);font-weight:900;font-size:22px}
+  .obs-table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
+  .obs-table th { text-align: left; color: var(--muted); font-weight: 500; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0 8px 10px 0; border-bottom: 1px solid var(--border); }
+  .obs-table td { padding: 7px 8px 7px 0; color: var(--text); border-bottom: 1px solid rgba(30,45,69,0.5); vertical-align: middle; }
+  .obs-table tr:last-child td { border-bottom: none; }
+  .temp-val { color: var(--accent2); font-weight: 700; }
+  .time-val { color: var(--muted); }
+  .tag { display: inline-flex; align-items: center; padding: 2px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase; }
+  .tag-metar { background: rgba(0,212,255,0.1); color: var(--accent); border: 1px solid rgba(0,212,255,0.2); }
+  .tag-hf { background: rgba(255,107,53,0.1); color: var(--accent2); border: 1px solid rgba(255,107,53,0.2); }
+  .tag-speci { background: rgba(255,71,87,0.1); color: var(--danger); border: 1px solid rgba(255,71,87,0.2); }
 
-/* ANALYSIS */
-.analysis{background:var(--s1);border:1px solid var(--bd);padding:20px;margin-bottom:12px}
-.analysis-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.a-badge{background:var(--acid);color:#000;font-family:var(--mono);font-size:9px;letter-spacing:2px;padding:3px 8px;font-weight:700}
-.a-title{font-family:var(--cond);font-size:17px;font-weight:700;letter-spacing:2px}
-.analysis-body{font-size:14px;line-height:1.9;color:#c8dff0}
-.analysis-body h2{font-family:var(--cond);font-size:13px;font-weight:700;letter-spacing:2px;color:#e0ecf8;margin:14px 0 4px;text-transform:uppercase;border-left:3px solid var(--acid);padding-left:8px}
-.loading{animation:pulse 1.6s ease-in-out infinite;font-family:var(--mono);font-size:11px;color:#4da6ff}
-.error-box{background:rgba(255,85,51,.07);border:1px solid rgba(255,85,51,.2);color:#ff9999;padding:12px 16px;font-family:var(--mono);font-size:11px;margin-bottom:12px}
-.prob-row{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px}
-.prob-temp{width:32px;color:#fff;text-align:right;flex-shrink:0}
-.prob-bar-wrap{flex:1;background:rgba(255,255,255,0.06);border-radius:2px;height:14px;overflow:hidden}
-.prob-bar-fill{height:100%;border-radius:2px;transition:width .4s ease}
-.prob-pct{width:36px;text-align:right;flex-shrink:0;color:#4da6ff}
-.warn-box{background:rgba(255,203,71,.07);border:1px solid rgba(255,203,71,.2);color:var(--gold);padding:12px 16px;font-family:var(--mono);font-size:11px;margin-bottom:12px}
-.footer{font-family:var(--mono);font-size:10px;color:#4da6ff;text-align:center;padding-top:14px;border-top:1px solid var(--bd);letter-spacing:1px}
-.spin{display:inline-block;animation:spin 1s linear infinite}
-.cond-item{background:var(--s1);border:1px solid var(--bd);padding:10px 12px;}
-.cond-label{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:#4da6ff;text-transform:uppercase;margin-bottom:4px}
-.cond-val{font-family:var(--cond);font-weight:700;font-size:20px;color:#fff}
-.cond-sub{font-family:var(--mono);font-size:11px;color:#4da6ff;margin-top:3px}
-.obs-badge{display:inline-block;font-family:var(--mono);font-size:8px;padding:1px 5px;margin-left:4px;vertical-align:middle}
-.obs-mt{background:rgba(0,255,200,.12);color:var(--acid);border:1px solid rgba(0,255,200,.2)}
-.obs-1m{background:rgba(91,200,255,.1);color:var(--ice);border:1px solid rgba(91,200,255,.2)}
-.section-head{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:#4da6ff;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
-.section-head::after{content:'';flex:1;height:1px;background:var(--bd)}
+  .copy-section { margin-top: 4px; }
+  .copy-btn { width: 100%; padding: 14px 24px; background: rgba(0,255,157,0.05); border: 1px solid var(--green); border-radius: 10px; color: var(--green); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .copy-btn:hover { background: rgba(0,255,157,0.12); box-shadow: 0 0 24px rgba(0,255,157,0.15); }
+  .copy-btn.copied { background: rgba(0,255,157,0.15); }
+  .copy-btn.tmrw-copy { background: rgba(167,139,250,0.05); border-color: var(--purple); color: var(--purple); }
+  .copy-btn.tmrw-copy:hover { background: rgba(167,139,250,0.12); box-shadow: 0 0 24px rgba(167,139,250,0.15); }
+  .copy-btn.tmrw-copy.copied { background: rgba(167,139,250,0.15); }
 
-/* PASSWORD GATE */
-.gate{position:fixed;inset:0;background:#07090d;z-index:99999;display:flex;align-items:center;justify-content:center}
-.gate-box{background:#0d1520;border:1px solid rgba(0,255,200,0.2);padding:48px 40px;width:320px;text-align:center}
-.gate-logo{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:#fff;letter-spacing:4px;margin-bottom:4px}
-.gate-logo em{color:var(--acid);font-style:normal}
-.gate-sub{font-family:var(--mono);font-size:9px;color:#4da6ff;letter-spacing:3px;margin-bottom:32px}
-.gate-label{font-family:var(--mono);font-size:9px;color:#4da6ff;letter-spacing:2px;text-align:left;margin-bottom:8px}
-.gate-input{width:100%;background:#07090d;border:1px solid rgba(0,255,200,0.25);color:#fff;font-family:var(--mono);font-size:14px;padding:10px 12px;outline:none;box-sizing:border-box;letter-spacing:2px}
-.gate-input:focus{border-color:var(--acid)}
-.gate-btn{width:100%;margin-top:12px;background:var(--acid);color:#000;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:3px;padding:11px;border:none;cursor:pointer;transition:opacity .2s}
-.gate-btn:hover{opacity:0.85}
-.gate-err{font-family:var(--mono);font-size:10px;color:var(--fire);margin-top:10px;min-height:16px;letter-spacing:1px}
+  @media (max-width: 600px) { h1 { font-size: 1.3rem; } .btn-row { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
-<div class="gate" id="gate">
-  <div class="gate-box">
-    <div class="gate-logo">CASH<em>CAST</em></div>
-    <div class="gate-sub">HIGH TEMP BETTING INTELLIGENCE</div>
-    <div class="gate-label">ACCESS CODE</div>
-    <input class="gate-input" type="password" id="gate-input" placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;" autocomplete="off" />
-    <button class="gate-btn" onclick="checkPassword()">ENTER &#8594;</button>
-    <div class="gate-err" id="gate-err"></div>
+<div class="container">
+
+  <header>
+    <div class="logo-row"><div class="logo-dot"></div><h1>Wethr<span>.net</span> Station Snapshot</h1></div>
+    <div class="subtitle">Pacing · Model Forecasts · 2-hr Observations — API v2</div>
+  </header>
+
+  <div class="config-panel">
+    <h2>⚙ Select Station</h2>
+    <div class="field">
+      <label>Station</label>
+      <div class="select-wrapper">
+        <select id="stationSelect">
+          <option value="KLAX">KLAX — Los Angeles, CA</option>
+          <option value="KATL">KATL — Atlanta, GA</option>
+          <option value="KAUS">KAUS — Austin, TX</option>
+          <option value="KBOS">KBOS — Boston, MA</option>
+          <option value="KCLT">KCLT — Charlotte, NC</option>
+          <option value="KMDW">KMDW — Chicago (Midway), IL</option>
+          <option value="KDFW">KDFW — Dallas/Ft Worth, TX</option>
+          <option value="KDCA">KDCA — Washington D.C.</option>
+          <option value="KDTW">KDTW — Detroit, MI</option>
+          <option value="KHOU">KHOU — Houston, TX</option>
+          <option value="KJAX">KJAX — Jacksonville, FL</option>
+          <option value="KLAS">KLAS — Las Vegas, NV</option>
+          <option value="KMIA">KMIA — Miami, FL</option>
+          <option value="KMSP">KMSP — Minneapolis, MN</option>
+          <option value="KOKC">KOKC — Oklahoma City, OK</option>
+          <option value="KPHL">KPHL — Philadelphia, PA</option>
+          <option value="KPHX">KPHX — Phoenix, AZ</option>
+          <option value="KSAT">KSAT — San Antonio, TX</option>
+          <option value="KSFO">KSFO — San Francisco, CA</option>
+          <option value="KSEA">KSEA — Seattle, WA</option>
+          <option value="KLGA">KLGA — New York (LaGuardia)</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="fetch-btn" id="fetchTodayBtn" onclick="fetchDay('today')">
+        <div class="spinner"></div><span class="btn-text">📅 Today's Data</span>
+      </button>
+      <button class="fetch-btn tmrw" id="fetchTmrwBtn" onclick="fetchDay('tomorrow')">
+        <div class="spinner"></div><span class="btn-text">🔭 Tomorrow's Data</span>
+      </button>
+    </div>
   </div>
+
+  <div class="status-bar" id="statusBar"></div>
+
+  <!-- TODAY SECTION -->
+  <div class="day-section" id="todaySection">
+    <div class="day-label today">📅 Today</div>
+
+    <div class="data-card">
+      <div class="card-header"><div class="card-title">📊 Current Conditions &amp; Pacing</div></div>
+      <div class="card-body"><div class="pacing-grid" id="pacingGridToday"></div></div>
+    </div>
+
+    <div class="data-card">
+      <div class="card-header">
+        <div class="card-title">🌐 Today — Model Forecast Pacing <span class="record-count" id="modelCountToday">—</span></div>
+      </div>
+      <div class="card-body no-max">
+        <table class="model-table">
+          <thead><tr><th>Model</th><th>Fcst High</th><th>High Time (Local)</th><th>Pacing</th><th>Actual (WU)</th><th>Pace</th></tr></thead>
+          <tbody id="tbodyModelsToday"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="data-card">
+      <div class="card-header">
+        <div class="card-title">🕐 All Observations — Last 2 hrs (5min / Hourly) <span class="record-count" id="countObsToday">—</span></div>
+      </div>
+      <div class="card-body">
+        <table class="obs-table">
+          <thead><tr><th>Time (UTC)</th><th>Temp</th><th>Dew Pt</th><th>RH%</th><th>Wind</th><th>Type</th></tr></thead>
+          <tbody id="tbodyObsToday"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="copy-section">
+      <button class="copy-btn" id="copyTodayBtn" onclick="copyToClipboard('today')">
+        <span>📋</span><span id="copyTodayText">📋 Re-copy to Clipboard</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- TOMORROW SECTION -->
+  <div class="day-section" id="tmrwSection">
+    <div class="day-label tomorrow">🔭 Tomorrow</div>
+
+    <div class="data-card">
+      <div class="card-header">
+        <div class="card-title tmrw-title">🌐 Tomorrow — Model Pacing Details <span class="record-count tmrw" id="modelCountTmrw">—</span></div>
+      </div>
+      <div class="card-body no-max">
+        <table class="model-table">
+          <thead><tr><th>Model</th><th>Fcst High</th><th>High Time (Local)</th><th>Pacing</th><th>Actual (WU)</th><th>Pace</th></tr></thead>
+          <tbody id="tbodyModelsTmrw"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="copy-section">
+      <button class="copy-btn tmrw-copy" id="copyTmrwBtn" onclick="copyToClipboard('tomorrow')">
+        <span>📋</span><span id="copyTmrwText">📋 Re-copy to Clipboard</span>
+      </button>
+    </div>
+  </div>
+
 </div>
-
-<div class="wrap">
-
-  <!-- HEADER -->
-  <div class="hdr">
-    <div class="logo">CASH<em>CAST</em><div style="font-family:var(--mono);font-size:9px;color:#4da6ff;letter-spacing:2px;margin-top:2px">HIGH TEMP BETTING INTELLIGENCE</div></div>
-    <div class="hdr-right">
-      <span class="update-time" id="update-time"></span>
-      <button class="btn" id="refresh-btn" onclick="loadData()">&#8635; REFRESH</button>
-    </div>
-  </div>
-
-  <!-- STATION PICKER -->
-  <div class="station-wrap">
-    <button class="station-btn" onclick="togglePicker()">
-      <span id="station-name">Los Angeles</span>
-      <span class="station-code" id="station-code">KLAX &#9660;</span>
-    </button>
-    <div class="station-drop" id="station-drop">
-      <input class="station-search" placeholder="Search&hellip;" oninput="filterStations(this.value)">
-      <div id="station-list"></div>
-    </div>
-  </div>
-
-  <!-- ERROR / WARN -->
-  <div id="error-box" style="display:none" class="error-box"></div>
-  <div id="warn-box" style="display:none" class="warn-box"></div>
-
-  <!-- STATS -->
-  <div class="stats">
-    <div class="stat acid stat-main">
-      <div class="stat-label">Live Running High &middot; WU / NWS</div>
-      <div class="stat-val stat-big" id="live-high" style="color:var(--acid);animation:glow 3s ease-in-out infinite">&mdash;&deg;</div>
-      <div class="stat-info" id="live-sub">Loading&hellip;</div>
-      <span class="chip" id="high-time" style="display:none"></span>
-    </div>
-    <div class="stat fire">
-      <div class="stat-label">Today NWS High</div>
-      <div class="stat-val stat-med" id="today-high" style="color:var(--fire)">&mdash;&deg;</div>
-      <div class="stat-info" id="today-sub"></div>
-    </div>
-    <div class="stat gold">
-      <div class="stat-label">Tomorrow NWS High</div>
-      <div class="stat-val stat-med" id="tomorrow-high" style="color:var(--gold)">&mdash;&deg;</div>
-      <div class="stat-info" id="tomorrow-sub"></div>
-    </div>
-  </div>
-
-
-  <!-- INTEGER PROBABILITY DASHBOARD -->
-  <div class="panel" id="prob-panel" style="display:none">
-    <div class="panel-label">INTEGER SETTLEMENT PROBABILITIES</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">
-      <!-- TODAY -->
-      <div>
-        <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--fire);margin-bottom:10px">TODAY</div>
-        <div id="prob-today-pin" style="font-family:var(--mono);font-size:11px;color:#4da6ff;margin-bottom:8px">Awaiting analysis&hellip;</div>
-        <div id="prob-today-bars" style="display:flex;flex-direction:column;gap:4px"></div>
-      </div>
-      <!-- TOMORROW -->
-      <div>
-        <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--gold);margin-bottom:10px">TOMORROW</div>
-        <div id="prob-tmrw-pin" style="font-family:var(--mono);font-size:11px;color:#4da6ff;margin-bottom:8px">Awaiting analysis&hellip;</div>
-        <div id="prob-tmrw-bars" style="display:flex;flex-direction:column;gap:4px"></div>
-      </div>
-    </div>
-    <div id="prob-pin-risk" style="display:none;margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--fire);letter-spacing:1px">⚠ HIGH PIN RISK DETECTED</div>
-  </div>
-
-  <!-- CURRENT CONDITIONS -->
-  <div id="conditions-section" style="display:none;margin-bottom:12px">
-    <div class="section-head">Current Conditions</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px" id="conditions-grid"></div>
-    <div style="font-family:var(--mono);font-size:9px;color:var(--mut);margin-top:6px" id="conditions-meta"></div>
-  </div>
-
-  <!-- BET BANNER -->
-  <div class="bet-banner" id="bet-banner" style="display:none">
-    <div>
-      <div class="bb-label">Bet Side</div>
-      <div id="bet-side" class="bet-pill">&mdash;</div>
-    </div>
-    <div>
-      <div class="bb-label">Edge</div>
-      <div class="bb-val" id="bet-edge">&mdash;</div>
-    </div>
-    <div>
-      <div class="bb-label">Trend</div>
-      <div class="bb-val" id="bet-trend">&mdash;</div>
-    </div>
-    <div>
-      <div class="bb-label">AI Projection &mdash; Tomorrow</div>
-      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
-        <div class="bb-val" style="color:var(--gold)" id="bet-proj">&mdash;</div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--mut)" id="bet-range"></div>
-      </div>
-      <div class="conf-bar"><div class="conf-fill" id="bet-conf-fill"></div></div>
-      <div style="font-family:var(--mono);font-size:9px;color:var(--mut);margin-top:3px" id="bet-conf-text"></div>
-      <div style="font-size:12px;color:var(--dim);margin-top:6px;line-height:1.5" id="bet-note"></div>
-    </div>
-  </div>
-
-  <!-- MODELS -->
-  <div id="models-section" style="display:none">
-    <div class="section-head">Model Consensus &mdash; Peak High</div>
-    <div class="models" id="models-grid"></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px" id="model-chips"></div>
-  </div>
-
-  <!-- HOURLY -->
-  <div class="two-col" id="hourly-section" style="display:none">
-    <div class="panel">
-      <div class="panel-label">Today Hourly (LST)</div>
-      <div class="h-bars" id="today-bars"></div>
-      <div class="h-labels" id="today-labels"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-label">Tomorrow Hourly (LST)</div>
-      <div class="h-bars" id="tomorrow-bars"></div>
-      <div class="h-labels" id="tomorrow-labels"></div>
-    </div>
-  </div>
-
-  <!-- DRIFT -->
-  <div id="drift-section" style="display:none">
-    <div class="section-head">Forecast Drift (version history)</div>
-    <div class="drift" id="drift-items"></div>
-  </div>
-
-  <!-- ANALYSIS -->
-  <div class="analysis">
-    <div class="analysis-head">
-      <div class="a-badge">FORENSIC AI</div>
-      <div class="a-title">METEOROLOGIST INTELLIGENCE REPORT</div>
-    </div>
-    <div id="analysis-body" class="loading">Waiting for data&hellip;</div>
-  </div>
-
-  <div class="footer">DATA: WETHR.NET API v2 &middot; ANALYSIS: CLAUDE AI &middot; NWS LOGIC &middot; FOR INFORMATIONAL USE ONLY &middot; NOT FINANCIAL ADVICE</div>
-</div>
-
 <script>
-// ━━ ACCESS CONTROL ━━
-// Change this to set your password:
-const ACCESS_PASSWORD = 'cashcast2026';
+  var storeToday = null, storeTmrw = null;
+  var PROXY = '/api/proxy';
+  var MODELS = ['GFS','HRRR','NAM','NBM','GEFS','ECMWF-IFS','ICON','GEM-GDPS','JMA','UKMO','ARPEGE','RAP','GFS-MOS','NBS-MOS','NAM-MOS','LAV-MOS','GEM-HRDPS','NAM4KM'];
+  var TZ_OFFSETS = {
+    'KLAX':-8,'KSFO':-8,'KSEA':-8,'KLAS':-8,'KPHX':-7,
+    'KMDW':-6,'KAUS':-6,'KDFW':-6,'KHOU':-6,'KMSP':-6,'KBNA':-6,'KMSY':-6,'KOKC':-6,'KSAT':-6,
+    'KATL':-5,'KBOS':-5,'KCLT':-5,'KDCA':-5,'KDTW':-5,'KJAX':-5,'KMIA':-5,'KLGA':-5,'KPHL':-5,'KNYC':-5
+  };
 
-function checkPassword(){
-  const val = document.getElementById('gate-input').value;
-  if(val === ACCESS_PASSWORD){
-    sessionStorage.setItem('cc_auth','1');
-    document.getElementById('gate').style.display='none';
-    loadData();
-  } else {
-    const err = document.getElementById('gate-err');
-    err.textContent = 'INCORRECT ACCESS CODE';
-    document.getElementById('gate-input').value='';
-    document.getElementById('gate-input').focus();
-    setTimeout(()=>{ err.textContent=''; }, 2000);
+  function proxyUrl(p){ return PROXY+'?'+new URLSearchParams(p).toString(); }
+
+  function setStatus(msg,type){
+    var el=document.getElementById('statusBar');
+    el.textContent=msg; el.className='status-bar '+(type||'');
   }
-}
 
-// Allow Enter key
-document.addEventListener('DOMContentLoaded', ()=>{
-  const inp = document.getElementById('gate-input');
-  if(inp) inp.addEventListener('keydown', e=>{ if(e.key==='Enter') checkPassword(); });
-  // Check if already authenticated this session
-  if(sessionStorage.getItem('cc_auth')==='1'){
-    document.getElementById('gate').style.display='none';
-    loadData();
+  function formatTime(t){
+    if(!t) return '—';
+    return String(t).replace('T',' ').replace('Z','').substring(0,19)+' UTC';
   }
-});
 
-const STATIONS = [
-  {code:"KLAX",tz:"America/Los_Angeles",name:"Los Angeles",climate:"Marine layer is THE dominant factor. Burn-off timing (10am-1pm) determines the high. Late burn-off = UNDER, early = OVER. WIND CAP RULE: When winds turn WESTERLY (240-300 deg) at 7+ mph, heating stalls and temp caps near current reading — this is the single strongest UNDER signal at LAX. Offshore/easterly flow (50-120 deg) = no marine influence = OVER. NWS LOX conservative on offshore flow days. Santa Ana events (NE 30-120 deg, low dew point) can spike 10-15F above forecast."},
-  {code:"KATL",tz:"America/New_York",name:"Atlanta",climate:"Elevated terrain (1050ft) means highs run 3-5F lower than surrounding lowlands. WIND CAP RULE: N/NE flow (330-60 deg) brings cooler continental air that caps heating 4-7F below forecast. SW flow is the heating driver — expect OVER on sustained SW. Afternoon convection (Jun-Aug) frequently ends pacing before peak — high often set pre-noon. NWS FFC reliable."},
-  {code:"KAUS",tz:"America/Chicago",name:"Austin",climate:"Transitional zone between Gulf moisture and dry continental air — high variance market. WIND CAP RULE: SE/S flow (120-200 deg) brings Gulf moisture that caps temps 5-8F via humidity dampening. Dry W/SW flow (220-280 deg) = strong OVER candidate — desert mixing reaches the station. Cap/convergence adds convective uncertainty. Growing urban heat island."},
-  {code:"KBOS",tz:"America/New_York",name:"Boston",climate:"Strong marine influence — sea breeze frequently caps summer highs 8-12F below inland. WIND CAP RULE: NE/E/SE onshore flow (30-150 deg) is a HARD CAP — temps plateau 8-12F below model consensus once sea breeze establishes, typically by noon. SW/W flow (200-280 deg) = continental air, no marine cap = OVER bias. NWS BOS historically conservative on summer highs."},
-  {code:"KCLT",tz:"America/New_York",name:"Charlotte",climate:"Piedmont location buffers coastal marine influence. WIND CAP RULE: NW flow (290-340 deg) brings cooler Appalachian-modified air that suppresses highs 3-6F. SW flow best for heating. Afternoon thunderstorm threat (Jun-Aug) can abruptly end pacing — if convection initiates before 2pm, high is likely already set. NWS GSP generally accurate."},
-  {code:"KMDW",tz:"America/Chicago",name:"Chicago (Midway)",climate:"Urban SW Chicago runs 2-4F warmer than KORD. WIND CAP RULE: NE/E/SE flow (30-150 deg) = Lake Michigan air advection = HARD CAP 8-14F below inland forecast. SW/W flow (210-280 deg) eliminates lake influence entirely = OVER bias. Wind direction is the single most important variable — check 925mb winds. More continental than KORD."},
-  {code:"KDFW",tz:"America/Chicago",name:"Dallas/Ft Worth",climate:"Excellent SW flow exposure. Urban heat island significant. WIND CAP RULE: N/NE flow (330-60 deg) post-frontal can suppress highs 8-15F dramatically. S/SW flow (160-240 deg) = dry-line heating = OVER. Dry line position creates high forecast uncertainty on convective days. Summer heat dome days (Jul-Aug) extremely reliable OVERs — NWS FWD conservative. 100F+ days come in streaks."},
-  {code:"KDCA",tz:"America/New_York",name:"Washington D.C.",climate:"Potomac location creates humidity trap. One of the strongest urban heat islands. WIND CAP RULE: NE/E flow (30-120 deg) brings marine air from Chesapeake/Atlantic that caps highs 5-8F below inland. SW flow (200-250 deg) = strongest heating setup = OVER. NWS WBC often conservative. 850mb temps critical — every 1C above normal adds ~1.5F to surface max."},
-  {code:"KDTW",tz:"America/Detroit",name:"Detroit",climate:"Great Lakes influence moderate. WIND CAP RULE: NE/E flow (30-120 deg) can advect Lake Erie/Huron cool air — cap effect 4-8F on strong onshore days. SW/W flow (200-270 deg) = continental heating = OVER setup. Urban heat island significant. NWS DTX generally reliable. More volatile than Chicago due to less direct lake exposure."},
-  {code:"KHOU",tz:"America/Chicago",name:"Houston",climate:"Gulf moisture creates persistent humidity cap. WIND CAP RULE: SE/S onshore flow (120-200 deg) maximizes Gulf moisture — temps rarely exceed 97F with strong onshore flow regardless of model output. NW/W flow (280-330 deg) = drier air = higher max potential. Sea breeze from Galveston Bay influences afternoons. NWS HGX reliable. Summer LOW VARIANCE market."},
-  {code:"KJAX",tz:"America/New_York",name:"Jacksonville",climate:"Inland enough to reduce coastal marine influence vs Miami. WIND CAP RULE: E/SE onshore flow (90-170 deg) brings Atlantic marine air — sea breeze typically arrives 2-4pm, later than Miami, allowing higher max temps first. W/NW flow (260-330 deg) = maximum heating = OVER bias. More volatile than South Florida — 850mb temps matter significantly."},
-  {code:"KLAS",tz:"America/Los_Angeles",name:"Las Vegas",climate:"Desert basin with strong thermal low. Valley traps heat. WIND CAP RULE: SW/W flow (220-290 deg) can bring marine-modified Pacific air over the Sierra — rare but can suppress highs 8-12F when it occurs. S/SE flow (150-220 deg) = desert recirculation = maximum heating. Summer highs extremely consistent 105-115F. Spring/fall highest variance — watch Pacific systems."},
-  {code:"KMIA",tz:"America/New_York",name:"Miami",climate:"Sea breeze battle between Atlantic and Gulf sides is dominant. WIND CAP RULE: E/SE onshore flow (80-170 deg) means sea breeze arrives by 11am-12pm — high ALWAYS set before it arrives, typically 10-11am. W/NW flow (260-330 deg) delays sea breeze = higher afternoon temps possible. Summer highs extremely consistent 88-92F — very LOW VARIANCE market. Watch dry season (Nov-Apr) for higher spread."},
-  {code:"KMSP",tz:"America/Chicago",name:"Minneapolis",climate:"Deep continental location — no significant water body influence. WIND CAP RULE: N/NE flow (330-70 deg) post-frontal brings Canadian air — can suppress highs 8-15F below prior day. S/SW flow (160-230 deg) = strong heating setup. Spring/fall highest variance. NWS MPX can underforecast on strong ridge days. Winter high temps heavily influenced by snow cover albedo."},
-  {code:"KOKC",tz:"America/Chicago",name:"Oklahoma City",climate:"Highest temperature volatility of any major market. WIND CAP RULE: N/NE flow (330-60 deg) = Blue Norther passages can drop highs 15-25F dramatically and rapidly — biggest UNDER signal in the network. S/SW flow (160-230 deg) = dry-line heating = maximum OVER potential. Dry line position swings forecast 10F+. Best OVER plays on sustained SW flow."},
-  {code:"KPHL",tz:"America/New_York",name:"Philadelphia",climate:"Urban heat corridor. Minimal direct marine influence despite Delaware Bay proximity. WIND CAP RULE: NE/E onshore flow (30-100 deg) can bring marine air from Atlantic — caps highs 4-7F on strong onshore days. SW flow (200-240 deg) = unobstructed continental heating = OVER. NWS PHI often underpredicts highs by 2-4F on 850mb ridge days. One of most reliable OVER stations in summer."},
-  {code:"KPHX",tz:"America/Phoenix",name:"Phoenix",climate:"Desert heat island — most extreme urban heat effect. Sky Harbor asphalt amplifies. WIND CAP RULE: SW/W flow (220-290 deg) from Pacific can bring moisture surge (monsoon wedge) — HARD CAP at 100-105F vs dry season 110-118F potential. SE/S flow (140-200 deg) = monsoon moisture arrival = immediate cap. Pre-monsoon (May-Jun) highest OVER potential with N/NW flow. NWS PSR very accurate dry conditions."},
-  {code:"KSAT",tz:"America/Chicago",name:"San Antonio",climate:"Balcones Escarpment creates drainage flow patterns. WIND CAP RULE: SE/S flow (130-200 deg) = Gulf moisture surge = humidity cap, temps constrained to 92-96F range. W/SW flow (240-290 deg) = dry continental air = OVER setup, can spike to 105F+. More volatile than Houston due to drier air mass potential. NWS EWX can underforecast exceptional heat days."},
-  {code:"KSFO",tz:"America/Los_Angeles",name:"San Francisco",climate:"Strongest marine influence of any station. WIND CAP RULE: W/NW onshore flow (260-330 deg) through Golden Gate is a PERMANENT CAP in summer — temps plateau 58-65F regardless of model output when onshore flow established. E/NE flow (60-120 deg) = rare offshore = OVER play, can reach 80-90F. Fog burn-off pattern similar to LAX but more persistent. Most reliable UNDER station in network."},
-  {code:"KSEA",tz:"America/Los_Angeles",name:"Seattle",climate:"Marine influence significant but less extreme than SFO. WIND CAP RULE: SW/W/NW onshore flow (200-330 deg) = Puget Sound marine air = cap at 65-75F on strong onshore days. E/NE flow (60-120 deg) over Cascades = offshore = heat wave setup, 90F+ possible. NWS SEW dramatically underforecasts rare heat waves when 850mb temps exceed climatology by 10C+. Normal summer very consistent."},
-  {code:"KLGA",tz:"America/New_York",name:"New York (LaGuardia)",climate:"Coastal exposure with runway heat soak effect. WIND CAP RULE: E/SE/S onshore flow (80-180 deg) = Atlantic sea breeze = HARD CAP 6-10F below inland. SW/W flow (210-280 deg) = no marine influence, runway asphalt amplifies = OVER. Generally runs 2-4F warmer than KNYC on light wind days. NWS OKX handles sea breeze well — trust the forecast on onshore days."},
-];
-const MODELS = ["GFS","HRRR","NBM","NAM","ECMWF-IFS","RAP","SREF","GEFS","CFS","RRFS","HREF","NBM-BC"];
-
-let currentStation = STATIONS[0];
-let pickerOpen = false;
-
-// \u2500\u2500 HELPERS \u2500\u2500
-function getDateInTz(tz, offsetDays){
-  const d = new Date();
-  const s = d.toLocaleDateString('en-US', {timeZone: tz||'America/New_York', year:'numeric', month:'2-digit', day:'2-digit'});
-  const [m,dy,y] = s.split('/');
-  const base = new Date(parseInt(y), parseInt(m)-1, parseInt(dy));
-  base.setDate(base.getDate() + (offsetDays||0));
-  return base.getFullYear()+'-'+String(base.getMonth()+1).padStart(2,'0')+'-'+String(base.getDate()).padStart(2,'0');
-}
-function getToday(tz){ return getDateInTz(tz, 0); }
-function getTomorrow(tz){ return getDateInTz(tz, 1); }
-function getTomorrow(){
-  const d=new Date(); d.setDate(d.getDate()+1);
-  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-}
-function el(id){ return document.getElementById(id); }
-function show(id){ const e=el(id); if(e) e.style.display=''; }
-function hide(id){ const e=el(id); if(e) e.style.display='none'; }
-function setText(id,val){ const e=el(id); if(e) e.textContent=val; }
-function setHTML(id,val){ const e=el(id); if(e) e.innerHTML=val; }
-function roundTemp(v){ return v != null ? Math.round(parseFloat(v)) : null; }
-
-function degreesToCompass(deg){
-  if(deg == null || deg === '' || isNaN(deg)) return '—';
-  const d = ((parseFloat(deg) % 360) + 360) % 360;
-  const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
-  return dirs[Math.round(d / 22.5) % 16];
-}
-
-async function wethr(file, params){
-  const qs = new URLSearchParams({_file: file, ...params}).toString();
-  const r = await fetch('/.netlify/functions/wethr?' + qs);
-  let json;
-  try { json = await r.json(); } catch(e) { throw new Error('JSON parse error: ' + e.message); }
-  if(!r.ok || json.error) throw new Error(json.error || 'HTTP ' + r.status);
-  return json;
-}
-
-// \u2500\u2500 STATION PICKER \u2500\u2500
-function buildStationList(filter){
-  const list = el('station-list');
-  const items = STATIONS.filter(s =>
-    !filter || s.name.toLowerCase().includes(filter.toLowerCase()) || s.code.toLowerCase().includes(filter.toLowerCase())
-  );
-  list.innerHTML = items.map(s =>
-    '<div class="station-item' + (s.code===currentStation.code?' active':'') + '" onclick="selectStation(\'' + s.code + '\')">' +
-    '<span>' + s.name + '</span><span class="station-item-code">' + s.code + '</span></div>'
-  ).join('');
-}
-
-function togglePicker(){
-  pickerOpen = !pickerOpen;
-  el('station-drop').className = 'station-drop' + (pickerOpen ? ' open' : '');
-  el('station-code').textContent = currentStation.code + (pickerOpen ? ' \u25B2' : ' \u25BC');
-  if(pickerOpen){ buildStationList(''); }
-}
-
-function filterStations(v){ buildStationList(v); }
-
-function selectStation(code){
-  currentStation = STATIONS.find(s=>s.code===code);
-  setText('station-name', currentStation.name);
-  el('station-drop').className = 'station-drop';
-  el('station-code').textContent = currentStation.code + ' \u25BC';
-  pickerOpen = false;
-  loadData();
-}
-
-document.addEventListener('click', function(e){
-  if(pickerOpen && !e.target.closest('.station-wrap')){ 
-    pickerOpen=false; 
-    el('station-drop').className='station-drop';
-    el('station-code').textContent = currentStation.code + ' \u25BC';
+  function formatTemp(obs,units){
+    var v=obs.temperature_display!=null?obs.temperature_display:obs.temperature_f!=null?obs.temperature_f:obs.temperature;
+    if(v==null) return '—';
+    return v+(units==='fahrenheit'?'°F':'°C');
   }
-});
 
-// \u2500\u2500 HOURLY BARS \u2500\u2500
-function renderBars(barsId, labelsId, hourly, hue){
-  if(!hourly.length){ hide(barsId); return; }
-  const mx = Math.max(...hourly.map(h=>h.t));
-  const mn = Math.min(...hourly.map(h=>h.t));
-  const rng = mx - mn || 1;
-  el(barsId).innerHTML = hourly.map(h => {
-    const pct = (h.t - mn) / rng;
-    const ht = Math.max(6, pct * 65);
-    return '<div class="h-bar" style="height:' + ht + 'px;background:hsl(' + (hue - pct*18) + ',90%,58%);opacity:' + (0.5+pct*0.5) + '"></div>';
-  }).join('');
-  el(labelsId).innerHTML = hourly.map(h =>
-    '<div class="h-label">' + String(h.h).padStart(2,'0') + '</div>'
-  ).join('');
-}
+  function formatDew(obs,units){
+    var dp=obs.dew_point;
+    if(dp==null) return '—';
+    return units==='fahrenheit'?Math.round(dp*9/5+32)+'°F':dp+'°C';
+  }
 
-// \u2500\u2500 MAIN LOAD \u2500\u2500
-async function loadData(){
-  const station = currentStation;
-  const btn = el('refresh-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spin">\u27F3</span>';
-  hide('error-box'); hide('warn-box');
-  hide('bet-banner'); hide('prob-panel'); hide('prob-pin-risk'); hide('models-section'); hide('hourly-section'); hide('drift-section');
-  // Clear ALL display fields to prevent stale data from previous station showing
-  setText('live-high', '\u2014\u00B0'); setText('live-sub', 'Loading\u2026');
-  hide('high-time');
-  setText('today-high', '\u2014\u00B0'); setText('today-sub', 'No forecast yet');
-  setText('tomorrow-high', '\u2014\u00B0'); setText('tomorrow-sub', 'No forecast yet');
-  el('conditions-grid').innerHTML = '';
-  el('conditions-meta').innerHTML = '';
-  setText('analysis-body', ''); el('analysis-body').className = 'loading';
-  setHTML('analysis-body', 'Fetching weather data\u2026');
+  function formatWind(obs){
+    if(obs.wind_speed==null) return '—';
+    return (obs.wind_direction||'—')+' '+obs.wind_speed+(obs.wind_gust?' G'+obs.wind_gust:'')+' kt';
+  }
 
-  const today = getToday(station.tz);
-  const tomorrow = getTomorrow(station.tz);
+  function guessType(obs){
+    var m=new Date((obs.observation_time||'').replace(' ','T').replace(/Z?$/,'Z')).getMinutes();
+    if(m===53||m===0||m===20||m===50) return 'METAR';
+    return m%5===0?'HF-METAR-5min':'HF-METAR-1min';
+  }
 
-  try {
-    // Fetch all data - each call fails independently
-    // mt = METAR (official hourly), 1m = 1-minute ASOS (sub-hourly, slightly noisier)
-    const [liveHigh, wuHigh, latestObs, obs1min, todayFcst, tomorrowFcst, historyData] = await Promise.all([
-      wethr('observations.php', {station_code: station.code, mode: 'wethr_high', logic: 'nws'}).catch(e => { console.warn('FAIL liveHigh:', e.message); return null; }),
-      wethr('observations.php', {station_code: station.code, mode: 'wethr_high', logic: 'wu'}).catch(e => { console.warn('FAIL wuHigh:', e.message); return null; }),
-      wethr('observations.php', {station_code: station.code, mode: 'latest'}).catch(e => { console.warn('FAIL latestObs:', e.message); return null; }),
-      wethr('observations.php', {station_code: station.code, mode: 'latest', precision: '1min'}).catch(e => { console.warn('FAIL obs1min:', e.message); return null; }),
-      wethr('nws_forecasts.php', {station_code: station.code, date: today, mode: 'latest'}).catch(e => { console.warn('FAIL todayFcst:', e.message); return null; }),
-      wethr('nws_forecasts.php', {station_code: station.code, date: tomorrow, mode: 'latest'}).catch(e => { console.warn('FAIL tomorrowFcst:', e.message); return null; }),
-      wethr('nws_forecasts.php', {station_code: station.code, date: today, mode: 'history'}).catch(e => { console.warn('FAIL history:', e.message); return null; }),
-    ]);
+  function getTagClass(t){
+    if(t.includes('1min')) return 'tag tag-hf';
+    if(t.includes('5min')) return 'tag tag-metar';
+    if(t.includes('SPECI')) return 'tag tag-speci';
+    return 'tag tag-metar';
+  }
 
-    console.log('RAW latestObs:', JSON.stringify(latestObs));
-    console.log('RAW wuHigh:', JSON.stringify(wuHigh));
-    console.log('DATA:', { liveHigh: !!liveHigh, latestObs: !!latestObs, obs1min: !!obs1min, dewPt: latestObs&&latestObs.dew_point, windSpd: latestObs&&latestObs.wind_speed, todayFcst: !!todayFcst, tomorrowFcst: !!tomorrowFcst });
+  function is1Min(obs){
+    return new Date((obs.observation_time||'').replace(' ','T').replace(/Z?$/,'Z')).getMinutes()%5!==0;
+  }
 
-    // \u2500\u2500 LIVE HIGH \u2500\u2500
-    if(liveHigh && liveHigh.wethr_high != null){
-      const nwsH = liveHigh.wethr_high;
-      const wuH = wuHigh && wuHigh.wethr_high != null ? wuHigh.wethr_high : null;
-      // WU is primary (finer resolution, more current); NWS shown as reference
-      const displayHigh = wuH != null ? wuH : nwsH;
-      setText('live-high', displayHigh + '\u00B0');
-      // Subtitle: MT temp + source breakdown
-      const mtDisp = latestObs && latestObs.temperature_display ? Math.round(parseFloat(latestObs.temperature_display)) : null;
-      const rhDisp = latestObs && latestObs.relative_humidity ? Math.round(latestObs.relative_humidity) : null;
-      const subParts = [];
-      if(mtDisp != null) subParts.push('MT: ' + mtDisp + '\u00B0F');
-      if(rhDisp != null) subParts.push('RH: ' + rhDisp + '%');
-      setText('live-sub', subParts.join(' \u00B7 '));
-      // High-time line: show both WU and NWS values + set time
-      let highSub = wuH != null ? 'WU: ' + wuH + '\u00B0F \u00B7 NWS: ' + nwsH + '\u00B0F' : 'NWS: ' + nwsH + '\u00B0F';
-      const timeSource = wuHigh && wuHigh.time_of_high_utc ? wuHigh : liveHigh;
-      if(timeSource.time_of_high_utc){
-        const t = new Date(timeSource.time_of_high_utc).toLocaleTimeString('en-US',{timeZone: station.tz, hour:'2-digit',minute:'2-digit'});
-        const tzA = new Date().toLocaleTimeString('en-US',{timeZone:station.tz,timeZoneName:'short'}).split(' ').pop();
-        setText('high-time', highSub + ' \u00B7 SET ' + t + ' ' + tzA);
-      } else {
-        setText('high-time', highSub);
-      }
-      show('high-time');
-    } else {
-      setText('live-high', '\u2014\u00B0');
-    }
+  function buildObsRow(obs,units){
+    var type=obs.product||guessType(obs);
+    return '<tr>'
+      +'<td class="time-val">'+formatTime(obs.observation_time)+'</td>'
+      +'<td class="temp-val">'+formatTemp(obs,units)+'</td>'
+      +'<td>'+formatDew(obs,units)+'</td>'
+      +'<td>'+(obs.relative_humidity!=null?obs.relative_humidity+'%':'—')+'</td>'
+      +'<td>'+formatWind(obs)+'</td>'
+      +'<td><span class="'+getTagClass(type)+'">'+type+'</span></td>'
+      +'</tr>';
+  }
 
-    // ── CURRENT OBS ──
-    // mt = official METAR (rounded to whole degrees, gold standard for high temp tracking)
-    // 1min = ASOS 1-minute (more recent but noisier, sub-degree precision)
-    // Use mt as authoritative, show 1min as supplemental real-time
-    const mtTemp = latestObs ? roundTemp(latestObs.temperature_display) : null;
-    const m1Temp = obs1min ? roundTemp(obs1min.temperature_display) : null;
+  function utcToLocalTimeStr(utcStr,tzOff){
+    if(!utcStr) return '—';
+    var d=new Date(utcStr.replace(' ','T').replace(/Z?$/,'Z'));
+    var local=new Date(d.getTime()+tzOff*3600000);
+    var h=local.getUTCHours(),min=local.getUTCMinutes();
+    var ampm=h>=12?'PM':'AM';
+    h=h%12||12;
+    return h+(min>0?':'+String(min).padStart(2,'0'):'')+' '+ampm;
+  }
 
-    if(latestObs){
-      const rh = latestObs.relative_humidity ? Math.round(latestObs.relative_humidity) : '—';
-      const m1Info = (m1Temp !== null && m1Temp !== mtTemp) ? ' · 1m: ' + m1Temp + '°F' : '';
-      setText('live-sub', 'MT: ' + (mtTemp||'—') + '°F' + m1Info + ' · RH: ' + rh + '%');
-    }
+  function getLocalDateStr(nowUtc,tzOff,daysAhead){
+    // Convert UTC to station local time using station's standard time offset
+    // Then add calendar days cleanly at midnight to avoid DST edge cases
+    var localMs = nowUtc.getTime() + tzOff*3600000;
+    var localDate = new Date(localMs);
+    // Get the date string at the station's local midnight
+    var y = localDate.getUTCFullYear();
+    var mo = localDate.getUTCMonth();
+    var d = localDate.getUTCDate() + (daysAhead||0);
+    var result = new Date(Date.UTC(y, mo, d));
+    return result.toISOString().slice(0,10);
+  }
 
-    // Build current conditions grid
-    const obsForDisplay = obs1min || latestObs;
-    const obsSource = obs1min ? '1m' : 'mt';
-    if(latestObs || obs1min){
-      const windDirRaw = latestObs && latestObs.wind_direction != null ? latestObs.wind_direction : null;
-      const windDir = windDirRaw != null ? degreesToCompass(windDirRaw) : '—';
-      const windDirDeg = windDirRaw != null ? Math.round(parseFloat(windDirRaw)) + '°' : '';
-      const windSpdRaw = latestObs && latestObs.wind_speed ? parseFloat(latestObs.wind_speed) : null;
-      const windSpd = windSpdRaw != null ? Math.round(windSpdRaw * 1.15078) : '—';
-      const windGustRaw = latestObs && latestObs.wind_gust ? parseFloat(latestObs.wind_gust) : null;
-      const windGust = (windGustRaw != null && windGustRaw > 0) ? Math.round(windGustRaw * 1.15078) : null;
-      const dewRawUI = latestObs && latestObs.dew_point != null ? parseFloat(latestObs.dew_point) : null;
-      // API returns dew point in Celsius — convert to Fahrenheit
-      const dewPt = dewRawUI != null ? Math.round(dewRawUI * 9/5 + 32) : '—';
-      const rh = latestObs && latestObs.relative_humidity ? Math.round(latestObs.relative_humidity) : '—';
-      const vis = latestObs && latestObs.visibility ? latestObs.visibility : '—';
-      const slp = latestObs && latestObs.sea_level_pressure ? parseFloat(latestObs.sea_level_pressure).toFixed(1) : '—';
-      const altim = latestObs && latestObs.altimeter ? parseFloat(latestObs.altimeter).toFixed(2) : '—';
-
-      // mt vs 1min temp comparison
-      const tempDiff = (mtTemp !== null && m1Temp !== null) ? (m1Temp - mtTemp) : null;
-      const tempDiffStr = tempDiff !== null ? (tempDiff >= 0 ? '+' : '') + tempDiff + '°' : '';
-
-      const conditions = [
-        {label:'TEMP (MT)', val: (mtTemp||'—')+'°F', sub: 'Official METAR', badge:'mt'},
-        {label:'TEMP (1MIN)', val: (m1Temp||'—')+'°F', sub: tempDiffStr ? 'vs MT: '+tempDiffStr : 'Sub-hourly ASOS', badge:'1m'},
-        {label:'DEW POINT', val: dewPt+'°F', sub: 'RH: '+rh+'%', badge:null},
-                {label:'WIND', val: windDir+' '+windSpd+'mph', sub: (windDirDeg ? windDirDeg+' · ' : '')+(windGust ? 'Gust: '+windGust+'mph' : 'Steady'), badge:null},
-        {label:'VISIBILITY', val: vis+' mi', sub: 'Surface', badge:null},
-        {label:'ALTIMETER', val: altim+'"', sub: 'SLP: '+slp+'mb', badge:null},
-      ];
-
-      // Add DSM high if available
-      if(latestObs && latestObs.dsm_high_display != null){
-        conditions.push({label:'DSM HIGH', val: Math.round(latestObs.dsm_high_display)+'°F', sub: 'Daily summary max', badge:'mt'});
-      }
-      // Add 6hr high if available
-      if(latestObs && latestObs.six_hour_high_display != null){
-        conditions.push({label:'6HR HIGH', val: Math.round(latestObs.six_hour_high_display)+'°F', sub: '6-hour max', badge:'mt'});
-      }
-
-      el('conditions-grid').innerHTML = conditions.map(c =>
-        '<div class="cond-item">' +
-          '<div class="cond-label">' + c.label +
-            (c.badge ? '<span class="obs-badge obs-'+c.badge+'">'+c.badge.toUpperCase()+'</span>' : '') +
-          '</div>' +
-          '<div class="cond-val">' + c.val + '</div>' +
-          '<div class="cond-sub">' + c.sub + '</div>' +
-        '</div>'
-      ).join('');
-
-      // Meta line showing observation times
-      const mtTime = latestObs && latestObs.observation_time ? latestObs.observation_time.split(' ')[1] : '';
-      const m1Time = obs1min && obs1min.observation_time ? obs1min.observation_time.split(' ')[1] : '';
-      el('conditions-meta').innerHTML =
-        '<span style="color:var(--acid)">MT</span> = Official METAR (hourly, rounded integers, authoritative for high temp) &nbsp;|&nbsp; ' +
-        '<span style="color:var(--ice)">1M</span> = ASOS 1-minute (sub-hourly, decimal precision, leading indicator)' +
-        (mtTime ? ' &nbsp;|&nbsp; MT obs: '+mtTime+' UTC' : '') +
-        (m1Time ? ' &nbsp;|&nbsp; 1M obs: '+m1Time+' UTC' : '');
-
-      show('conditions-section');
-    }
-
-    // \u2500\u2500 TODAY \u2500\u2500
-    if(todayFcst && todayFcst.high != null){
-      setText('today-high', todayFcst.high + '\u00B0');
-      const dsm = latestObs && latestObs.dsm_high_display ? latestObs.dsm_high_display + '\u00B0F' : '\u2014';
-      setText('today-sub', 'DSM: ' + dsm + ' \u00B7 v' + todayFcst.version);
-    } else {
-      setText('today-high', '\u2014\u00B0');
-      setText('today-sub', 'No forecast yet');
-    }
-
-    // \u2500\u2500 TOMORROW \u2500\u2500
-    if(tomorrowFcst && tomorrowFcst.high != null){
-      setText('tomorrow-high', tomorrowFcst.high + '\u00B0');
-      setText('tomorrow-sub', 'Low: ' + (tomorrowFcst.low||'\u2014') + '\u00B0F \u00B7 v' + tomorrowFcst.version);
-    } else {
-      setText('tomorrow-high', '\u2014\u00B0');
-      setText('tomorrow-sub', 'No forecast yet');
-    }
-
-    // \u2500\u2500 HOURLY BARS \u2500\u2500
-    const todayHourly = (todayFcst && todayFcst.hourly_temps) ? todayFcst.hourly_temps.map((t,i)=>({h:i,t})).filter(x=>x.t!=null) : [];
-    const tomorrowHourly = (tomorrowFcst && tomorrowFcst.hourly_temps) ? tomorrowFcst.hourly_temps.map((t,i)=>({h:i,t})).filter(x=>x.t!=null) : [];
-    if(todayHourly.length || tomorrowHourly.length){
-      show('hourly-section');
-      renderBars('today-bars','today-labels',todayHourly,10);
-      renderBars('tomorrow-bars','tomorrow-labels',tomorrowHourly,45);
-    }
-
-    // \u2500\u2500 DRIFT \u2500\u2500
-    if(historyData && historyData.forecasts && historyData.forecasts.length > 1){
-      const versions = historyData.forecasts;
-      el('drift-items').innerHTML = versions.map((v,i) => {
-        const isLatest = i === versions.length-1;
-        return '<div class="drift-item" style="' + (isLatest?'border-color:var(--acid)':'') + '">' +
-          '<div class="drift-v">v' + v.version + (isLatest?' \u2605':'') + '</div>' +
-          '<div class="drift-h" style="color:' + (isLatest?'var(--fire)':'#fff') + '">' + (v.high||'\u2014') + '\u00B0</div>' +
-        '</div>';
-      }).join('');
-      show('drift-section');
-    }
-
-    // \u2500\u2500 MODEL CONSENSUS \u2500\u2500
-    const now = new Date();
-    // Pull 30 hours to capture full today + overnight into tomorrow
-    const pe = new Date(now); pe.setHours(pe.getHours()+30);
-    const psStr = now.toISOString().split('.')[0]+'Z';
-    const peStr = pe.toISOString().split('.')[0]+'Z';
-    const mResults = await Promise.allSettled(
-      MODELS.map(m => wethr('forecasts.php', {location_name: station.code, start_valid_time: psStr, end_valid_time: peStr, model: m}))
-    );
-    const modelForecasts = [];
-    mResults.forEach((r,i) => {
-      if(r.status==='fulfilled' && Array.isArray(r.value) && r.value.length>0){
-        const pts = r.value.filter(d=>d.temperature_f!=null);
-        if(pts.length){
-          const temps = pts.map(d=>d.temperature_f);
-          const high = Math.round(Math.max(...temps));
-          // Build hourly pacing curve: [hour_offset, temp] pairs
-          const pacing = pts.map(d=>{
-            const hr = Math.round((new Date(d.valid_time)-now)/3600000);
-            return [hr, Math.round(d.temperature_f)];
-          }).filter(p=>p[0]>=0 && p[0]<=18);
-          modelForecasts.push({model:MODELS[i], high, pacing});
-        }
-      }
+  function processForecasts(rows,station,targetDateStr,nowUtc,wuHigh,wuLow,isTomorrow){
+    var tzOff=TZ_OFFSETS[station]||-5;
+    var modelMap={};
+    rows.forEach(function(row){
+      var vt=new Date(row.valid_time.replace(' ','T').replace(/Z?$/,'Z'));
+      var vtLocal=new Date(vt.getTime()+tzOff*3600000);
+      if(vtLocal.toISOString().slice(0,10)!==targetDateStr) return;
+      var model=row.model;
+      if(!modelMap[model]) modelMap[model]={model:model,runTime:row.run_time,rows:[]};
+      if(row.run_time>modelMap[model].runTime){modelMap[model].runTime=row.run_time;modelMap[model].rows=[];}
+      if(row.run_time===modelMap[model].runTime) modelMap[model].rows.push(row);
     });
-    if(modelForecasts.length){
-      const mean = Math.round(modelForecasts.reduce((a,m)=>a+m.high,0)/modelForecasts.length);
-      const spread = Math.max(...modelForecasts.map(m=>m.high)) - Math.min(...modelForecasts.map(m=>m.high));
-      el('models-grid').innerHTML = modelForecasts.map(m => {
-        const diff = m.high - mean;
-        const col = diff>1?'var(--fire)':diff<-1?'var(--ice)':'#fff';
-        return '<div class="model-box"><div class="model-name">'+m.model+'</div><div class="model-val" style="color:'+col+'">'+m.high+'\u00B0</div></div>';
-      }).join('');
-      el('model-chips').innerHTML = 
-        '<span class="chip">MEAN ' + mean + '\u00B0F</span>' +
-        '<span class="chip" style="' + (spread>4?'color:var(--fire);border-color:rgba(255,85,51,.3)':'') + '">SPREAD ' + spread + '\u00B0F</span>';
-      show('models-section');
-    }
 
-    // \u2500\u2500 TIMESTAMP \u2500\u2500
-    setText('update-time', 'UPDATED ' + new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
-
-    // Warn if data missing
-    if(!latestObs && !liveHigh && !todayFcst){
-      el('warn-box').textContent = '\u26A0 Could not load weather data. Check back shortly.';
-      show('warn-box');
-    } else if(!todayFcst && !tomorrowFcst){
-      el('warn-box').textContent = '\u26A0 NWS forecast not yet available \u2014 showing live observations only';
-      show('warn-box');
-    }
-
-    // \u2500\u2500 AI ANALYSIS \u2500\u2500
-    el('analysis-body').className = 'loading';
-    setHTML('analysis-body', '\u25C8 Analyzing forecast drift and model spread\u2026<br>\u25C8 Generating betting intelligence\u2026');
-    runAI(station, liveHigh, wuHigh, latestObs, obs1min, todayFcst, tomorrowFcst, modelForecasts, historyData);
-
-  } catch(err) {
-    console.error('loadData error:', err);
-    el('error-box').textContent = '\u26A0 ' + err.message;
-    show('error-box');
-    setHTML('analysis-body', 'Analysis unavailable.');
-    el('analysis-body').className = 'analysis-body';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '\u27F3 REFRESH';
-  }
-}
-
-async function runAI(station, liveHigh, wuHigh, obs, obs1min, todayFcst, tomorrowFcst, models, history){
-  const histVer = history && history.forecasts ? history.forecasts.slice(-6).map(v=>({v:v.version,high:v.high})) : null;
-
-  // Time context — use STATION's timezone, not browser timezone
-  const stationTz = station.tz || 'America/New_York';
-  const now = new Date();
-  const stationHour = parseInt(now.toLocaleString('en-US', {timeZone: stationTz, hour: 'numeric', hour12: false}));
-  const timeStr = now.toLocaleTimeString('en-US', {timeZone: stationTz, hour:'2-digit', minute:'2-digit'});
-  const dateStr = now.toLocaleDateString('en-US', {timeZone: stationTz, weekday:'long', month:'short', day:'numeric'});
-  const tzAbbr = now.toLocaleTimeString('en-US', {timeZone: stationTz, timeZoneName:'short'}).split(' ').pop();
-  let phase, todayStatus;
-  if(stationHour < 6){ phase='PRE-DAWN'; todayStatus='Today high NOT YET SET. Peak heating 5-8 hours away.'; }
-  else if(stationHour < 10){ phase='MORNING'; todayStatus='Today high NOT YET SET. Peak likely 2-6 hours away.'; }
-  else if(stationHour < 13){ phase='MID-MORNING'; todayStatus='Today high NOT YET SET. Peak likely 1-3 hours away.'; }
-  else if(stationHour < 16){ phase='PEAK HEATING'; todayStatus='Today high IS BEING SET NOW. Current temp may BE the high.'; }
-  else if(stationHour < 19){ phase='LATE AFTERNOON'; todayStatus='Today high LIKELY ALREADY SET. Post-peak cooling underway.'; }
-  else if(stationHour < 21){ phase='EVENING'; todayStatus='Today high ALMOST CERTAINLY SET. Focus on tomorrow.'; }
-  else { phase='NIGHT'; todayStatus='Today high IS FINAL. Do NOT discuss today trajectory. Focus entirely on tomorrow.'; }
-  const timeContext = 'TIME: '+timeStr+' '+tzAbbr+' ('+phase+') | '+dateStr+'\nSTATION TIMEZONE: '+stationTz+'\nTODAY STATUS: '+todayStatus;
-
-  // Model summary
-  const modelPeaks = models.length ? models.map(m=>m.model+':'+m.high+'F').join(', ') : 'N/A';
-  const modelMean = models.length ? Math.round(models.reduce((a,m)=>a+m.high,0)/models.length) : null;
-  const modelSpread = models.length ? Math.max(...models.map(m=>m.high))-Math.min(...models.map(m=>m.high)) : null;
-
-  // Pacing table
-  let pacingTable = 'N/A';
-  if(models.length > 0){
-    // Every 2hrs to reduce tokens while preserving trend shape
-    const allHours = [...new Set(models.flatMap(m=>m.pacing.map(p=>p[0])))].sort((a,b)=>a-b).filter(h=>h>=0);
-    const header = 'HR  | ' + models.map(m=>m.model.padEnd(10)).join(' | ');
-    const rows = allHours.map(hr=>{
-      const vals = models.map(m=>{
-        const pt = m.pacing.find(p=>p[0]===hr) || m.pacing.find(p=>p[0]===hr+1);
-        return pt?String(pt[1]).padEnd(10):'?'.padEnd(10);
+    var results=[];
+    Object.values(modelMap).forEach(function(m){
+      var maxTemp=null,maxTime=null,maxPacing=null;
+      m.rows.forEach(function(row){
+        var tf=row.temperature_f;
+        if(tf==null) return;
+        if(maxTemp===null||tf>maxTemp){maxTemp=tf;maxTime=row.valid_time;}
+        // pacing: for tomorrow we use ALL rows (full day hasn't happened yet, so the forecast itself IS the pace)
+        // for today we only count rows up to now
+        var vt=new Date(row.valid_time.replace(' ','T').replace(/Z?$/,'Z'));
+        if(isTomorrow || vt<=nowUtc){
+          if(maxPacing===null||tf>maxPacing) maxPacing=tf;
+        }
       });
-      return String(hr).padStart(3)+' | '+vals.join(' | ');
+      if(maxTemp===null) return;
+
+      var runHour=m.runTime?new Date(m.runTime.replace(' ','T').replace(/Z?$/,'Z')).getUTCHours()+'Z':'';
+      var modelLabel=m.model+(runHour?' ('+runHour+')':'');
+      var highTimeLocal=utcToLocalTimeStr(maxTime,tzOff);
+
+      var deltaStr='—',deltaClass='';
+      if(maxPacing!==null&&maxTemp!==null){
+        // Pace = forecast high minus current pacing high (how far model still needs to climb)
+        var pace=Math.round((maxTemp-maxPacing)*10)/10;
+        var sign=pace>=0?'+':'';
+        deltaStr=sign+pace;
+        // Red = model already above forecast (overshot), Blue = model below forecast (needs to climb)
+        deltaClass=pace<0?'pace-neg':'pace-pos';
+      }
+
+      results.push({
+        model:modelLabel,
+        forecastHigh:Math.round(maxTemp*10)/10,
+        highTimeLocal:highTimeLocal,
+        pacingHigh:maxPacing!==null?Math.round(maxPacing*10)/10:null,
+        wuRange:wuHigh!==null?wuLow+'–'+wuHigh+'°F':'—',
+        delta:deltaStr,
+        deltaClass:deltaClass
+      });
     });
-    pacingTable = header+'\n'+rows.join('\n');
+
+    results.sort(function(a,b){
+      var ai=MODELS.findIndex(function(m){return a.model.startsWith(m);});
+      var bi=MODELS.findIndex(function(m){return b.model.startsWith(m);});
+      return (ai===-1?999:ai)-(bi===-1?999:bi);
+    });
+    return results;
   }
 
-  // Obs values
-  const mtTemp = obs ? roundTemp(obs.temperature_display) : null;
-  const m1Temp = obs1min ? roundTemp(obs1min.temperature_display) : null;
-  // API returns wind in knots — convert to MPH (1 kt = 1.15078 mph)
-  const dewRawC = obs && obs.dew_point != null ? parseFloat(obs.dew_point) : null;
-  // API returns dew point in Celsius — convert to Fahrenheit
-  const dewPt = dewRawC != null ? (dewRawC * 9/5 + 32).toFixed(1) : 'N/A';
-  const rh = obs && obs.relative_humidity ? Math.round(obs.relative_humidity) : 'N/A';
-  const windDirRaw = obs && obs.wind_direction != null ? obs.wind_direction : null;
-  const windDir = windDirRaw != null ? degreesToCompass(windDirRaw) + ' (' + Math.round(parseFloat(windDirRaw)) + '\u00B0)' : 'N/A';
-  const windSpdKt = obs && obs.wind_speed ? parseFloat(obs.wind_speed) : null;
-  const windGustKt = obs && obs.wind_gust ? parseFloat(obs.wind_gust) : null;
-  const windSpd = windSpdKt != null ? Math.round(windSpdKt * 1.15078) : 'N/A';
-  const windGust = (windGustKt != null && windGustKt > 0) ? Math.round(windGustKt * 1.15078) : null;
-  const vis = obs && obs.visibility ? obs.visibility : 'N/A';
-  const altim = obs && obs.altimeter ? parseFloat(obs.altimeter).toFixed(2) : 'N/A';
-  const slp = obs && obs.sea_level_pressure ? parseFloat(obs.sea_level_pressure).toFixed(1) : 'N/A';
+  async function fetchDay(day){
+    var isTomorrow=day==='tomorrow';
+    var station=document.getElementById('stationSelect').value;
+    var btnId=isTomorrow?'fetchTmrwBtn':'fetchTodayBtn';
+    var btn=document.getElementById(btnId);
+    btn.disabled=true; btn.classList.add('loading');
+    btn.querySelector('.btn-text').textContent='Fetching…';
+    setStatus('Fetching '+(isTomorrow?"tomorrow's":"today's")+' data for '+station+'…');
 
-  const prompt =
-'You are an ELITE FORENSIC METEOROLOGIST and WEATHER DERIVATIVES TRADER operating a professional temperature betting desk.\n' +
-'Your objective: determine the most likely EXACT official daily high temperature and compute settlement probabilities for Kalshi contracts.\n\n' +
-'STATION: '+station.name+' ('+station.code+') | DATE: '+getToday(station.tz)+'\n\n' +
-'=== TIME CONTEXT (CRITICAL) ===\n' + timeContext + '\n\n' +
-'=== STATION MICROCLIMATE PROFILE ===\n' + station.climate + '\n\n' +
-'=== SETTLEMENT RULE ===\\n'
-+ 'Official high = highest METAR/ASOS integer temp recorded during the calendar day.\\n'
-+ 'WU Running High = real-time best proxy for final settlement.\\n'
-+ 'CRITICAL: NWS forecast number is a PREDICTION — never use it as today actual settled high.\\n'
-+ 'After 6pm: use WU Running High as the settled high for ALL overnight calculations.\\n' +
-'=== LIVE OBSERVATION TAPE ===\n' +
-'WU Running High (primary - finer resolution): '+(wuHigh&&wuHigh.wethr_high!=null?wuHigh.wethr_high:'N/A')+'F\n' +
-'NWS Running High (reference): '+(liveHigh&&liveHigh.wethr_high!=null?liveHigh.wethr_high:'N/A')+'F\n' +
-'Temp MT (official METAR, settlement basis): '+(mtTemp!=null?mtTemp:'N/A')+'F\n' +
-'Temp 1MIN (ASOS sub-hourly, leading indicator): '+(m1Temp!=null?m1Temp:'N/A')+'F\n' +
-'Dew Point: '+dewPt+'F | RH: '+rh+'% | Temp-Dew Spread: '+(mtTemp!=null&&dewPt!='N/A'?(mtTemp-parseFloat(dewPt)).toFixed(1):'N/A')+'F\n' +
-'Wind: '+windDir+' '+windSpd+'mph'+(windGust?' Gust '+windGust+'mph':'')+'\n' +
-'Visibility: '+vis+' mi | Altimeter: '+altim+'" | SLP: '+slp+'mb\n\n' +
-'=== AIR MASS & WIND CAP ANALYSIS ===\n' +
-'1) Classify air mass: marine layer / offshore flow / desert mixing / continental / frontal.\n' +
-'2) WIND CAP GUIDANCE (weighted signal, not a verdict):\n' +
-'   Read the WIND CAP RULE in the station microclimate profile. Compare current wind direction (degrees) to the cap zone.\n' +
-'   If wind is IN cap zone: note as a SUPPRESSION SIGNAL — lean toward lower end of model range, but do NOT treat as absolute.\n' +
-'   Wind caps can break — shifts happen, especially at stations with volatile regimes (OKC, DFW, LAX offshore transitions).\n' +
-'   Weight the cap signal heavier the longer the capping wind has been sustained (check pacing table for persistence).\n' +
-'   A cap that has held for 3+ hours through peak heating window is a much stronger signal than one that just established.\n' +
-'   Always note: what wind shift would BREAK the cap, and how likely is that in the next 2-4 hours?\n' +
-'   If wind is in heating zone: confirm cap not active, but flag if a shift toward cap zone is possible.\n' +
-'3) Calculate heating velocity from obs tape (30min / 1hr / 3hr rate). State if accelerating, steady, decelerating, or plateaued.\n\n' +
-'=== NWS FORECAST ===\n' +
-'TODAY ACTUAL SETTLED HIGH (WU - THIS is today real high, NOT the forecast): '+(wuHigh&&wuHigh.wethr_high!=null?wuHigh.wethr_high:'N/A')+'F\\n' +
-'Today NWS Forecast (forecast only, NOT the settled high): '+(todayFcst&&todayFcst.high!=null?todayFcst.high:'N/A')+'F (v'+(todayFcst?todayFcst.version:'?')+')\\n' +
-'Tomorrow NWS Forecast: '+(tomorrowFcst&&tomorrowFcst.high!=null?tomorrowFcst.high:'N/A')+'F (v'+(tomorrowFcst?tomorrowFcst.version:'?')+')\\n' +
-'Today Hourly: '+(todayFcst&&todayFcst.hourly_temps?todayFcst.hourly_temps.map((t,i)=>i+'h:'+t+'F').filter((s,i)=>i>=6&&i<=24&&!s.includes('null')).join(' '):'N/A')+'\\n' +
-'Tomorrow Hourly: '+(tomorrowFcst&&tomorrowFcst.hourly_temps?tomorrowFcst.hourly_temps.map((t,i)=>i+'h:'+t+'F').filter((s,i)=>i>=6&&i<=24&&!s.includes('null')).join(' '):'N/A')+'\n\n' +
-'=== FORECAST VERSION DRIFT ===\n' +
-(histVer?histVer.map(v=>'v'+v.v+':'+v.high+'F').join(' -> '):'N/A')+'\n\n' +
-'=== MODEL INTEGRITY BOARD ===\n' +
-'Peak Highs: '+modelPeaks+'\n' +
-(modelMean?'Mean: '+modelMean+'F | Spread: '+modelSpread+'F\n':'')+
-'SCREEN EACH MODEL: compute Model Error = Predicted - Current MT temp. Flag biased outliers (>3F off pacing). Retain 3-6 best performers.\n\n' +
-'=== FULL MODEL PACING TABLE (hours from now) ===\n' +
-pacingTable+'\n\n' +
-'TIME INSTRUCTION: '+timeContext+'\n'
-+ 'If today high is FINAL/SET: confirm the settled number in one line, then devote the rest of the report to TOMORROW.\n'
-+ 'If today is still active: analyze today trajectory AND tomorrow.\n\n'
-+ '=== CRITICAL FRAMEWORK: TODAY BIAS TRANSFERS TO TOMORROW ===\n'
-+ 'The model pacing errors you measure TODAY are the best available signal for correcting TOMORROW projections.\n'
-+ 'A model running +4F hot today will likely run +4F hot tomorrow. Apply these measured biases to the tomorrow peak highs.\n'
-+ 'As the day progresses, your today data becomes increasingly precise — use it to sharpen the tomorrow projection.\n\n'
-+ 'OUTPUT THE FOLLOWING SECTIONS:\n\n'
-+ '## CURRENT CONDITIONS AUDIT\n'
-+ 'Classify air mass regime (marine layer / offshore flow / desert mixing / continental / frontal).\n'
-+ 'Calculate heating velocity: compare model pacing temps at recent hours vs current MT. State if accelerating, steady, decelerating, or topped out.\n\n'
-+ '## TODAY HIGH — FINAL OR STILL ACTIVE?\n'
-+ 'STEP 1 — DETERMINE STATUS:\n'
-+ 'If current station time is BEFORE 6pm LOCAL: today may still be active — apply diurnal curve solver below.\n'
-+ 'If current station time is AFTER 6pm LOCAL: today high is almost certainly FINAL — state settled integer.\n'
-+ '  EXCEPTION — VAMPIRE TEMP CHECK: Even after 6pm, scan model pacing table and NWS hourly data for any\n'
-+ '  projected rise after sunset. Vampire temps occur at: KPHX (stored ground heat + downslope wind shifts),\n'
-+ '  KLAS (valley heat recirculation), KDFW/KSAT/KAUS (dry line return flow after frontal passage),\n'
-+ '  KOKC (Blue Norther reversal), and any station showing post-6pm model pacing HIGHER than current MT.\n'
-+ '  If vampire temp signal detected: flag it explicitly and keep today active.\n'
-+ 'STEP 2 — IF ACTIVE: apply diurnal curve solver — remaining heating estimate based on regime:\n'
-+ '  Early Ramp (<10am): +8-15F inland / +4-9F coastal remaining\n'
-+ '  Midday Engine (10am-1pm): +3-8F inland / +2-5F coastal remaining\n'
-+ '  Late Flattening (1-4pm): +1-4F inland / +0-2F coastal remaining\n'
-+ '  Plateau/Post-Peak (>4pm): 0-1F, likely done\n'
-+ 'Add thermal runway estimate (Dry +6-10F / Mixed +3-6F / Marine +0-3F efficiency).\n\n'
-+ '## MODEL INTEGRITY SCREEN — TODAY PACING\n'
-+ 'If current time is AFTER 6pm: skip daytime pacing error analysis — nighttime model errors are meaningless noise.\n'
-+ '  INSTEAD: Use current overnight MT as a forward signal for tomorrow.\n'
-+ '  OVERNIGHT BASE RULE: If current MT is within 15F of today settled high → WARM FLOOR → bullish signal for tomorrow.\n'
-+ '  Calculate: Overnight retention % = (current MT - expected overnight low) / (today high - expected overnight low).\n'
-+ '  High retention (>60%) = boundary layer not fully flushed = tomorrow heating starts from elevated base.\n'
-+ '  Then check which models best predicted TONIGHTS overnight temp — those are your trusted models for tomorrow.\n'
-+ 'If current time is BEFORE 6pm: run full pacing error analysis:\n'
-+ 'For EACH model compute: Model Error = Model current-hour temp - Actual MT temp.\n'
-+ 'Classify: Truth Teller (±1F) / Usable (±3F) / Biased (>3F) / Discard (physically inconsistent).\n'
-+ 'Show a table: Model | Predicted Now | Actual MT | Error | Classification | Weight | Classification\\n'
-+ 'RETAIN only Truth Tellers and Usable models for the tomorrow projection. Discard the rest.\n\n'
-+ '## BIAS-CORRECTED TOMORROW PROJECTION\n'
-+ 'THIS IS THE PRIMARY DELIVERABLE. Apply today measured biases directly to tomorrow forecasts:\n'
-+ '  Bias Corrected Tomorrow High = Model Raw Tomorrow Peak - Model Pacing Error (measured today or overnight)\n'
-+ 'Show table: Model | Raw Tomorrow High | Pacing Error | Bias-Corrected Tomorrow High | Weight\n'
-+ 'CRITICAL ANCHOR RULE: The NWS human forecast (tomorrow high) must be treated as a HIGH-WEIGHT anchor.\n'
-+ '  NWS forecasters have local knowledge, sounding data, and pattern recognition that raw models miss.\n'
-+ '  If bias-corrected model cluster deviates more than 4F from NWS forecast, investigate WHY before dismissing NWS.\n'
-+ '  GFS and RAP are known to run cold at coastal stations (KLAX, KSFO, KSEA) — do not over-weight them.\n'
-+ '  NBM is often the best blend and should get highest weight when it verifies overnight pacing well.\n'
-+ 'WU RUNNING HIGH RULE: The WU running high is the most real-time settlement proxy available.\n'
-+ '  If WU high > NWS DSM high → actual settlement likely tracks WU, not NWS official.\n'
-+ '  Weight WU as primary settlement reference over NWS DSM for final high projection.\n'
-+ 'Then: cluster bias-corrected highs into 2F bands. Apply synoptic regime modifier.\n'
-+ 'Apply microclimate adjustment from station profile.\n'
-+ 'State final: MOST LIKELY INTEGER | FORECAST RANGE | HARD FLOOR | HARD CEILING.\n\n'
-+ '## INTEGER SETTLEMENT PROBABILITIES — TOMORROW\n'
-+ 'Probability table for ±3 integers around your pin. Must sum to 100%.\n'
-+ 'Example: 82F:8% 83F:19% 84F:35% 85F:24% 86F:10% 87F:4%\n'
-+ 'Flag HIGH PIN RISK if any single integer >30% probability.\n'
-+ 'Note data confidence level: early-day projection (wider bands) vs late-day (tighter, more today bias data available).\n\n'
-+ '## MARKET PRICING — KALSHI EDGE\n'
-+ 'State the most likely Kalshi strike. Compute YES >X and NO >X probabilities from your integer table.\n'
-+ 'Give your edge: OVER / UNDER / PASS with confidence %.\n'
-+ 'Note if confidence is lower due to early-day uncertainty vs high-confidence late-day call.\n\n'
-+ '## RISK FLAGS\n'
-+ 'What invalidates this call? Be specific: wind shift timing, marine layer behavior, model outlier scenario, sensor bias, synoptic pattern change.';
+    var tzOff=TZ_OFFSETS[station]||-5;
+    var nowUtc=new Date();
+    var targetDateStr=getLocalDateStr(nowUtc,tzOff,isTomorrow?1:0);
 
-  try {
-    const r = await fetch('/.netlify/functions/claude', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:2500, messages:[{role:'user',content:prompt}]})
-    });
-    const d = await r.json();
-    console.log('Claude status:', r.status, JSON.stringify(d).slice(0,150));
-    if(d.error){ throw new Error(typeof d.error==='string'?d.error:JSON.stringify(d.error)); }
-    const text = d.content ? d.content.map(b=>b.text||'').join('\n') : '';
-    const html = text
-      .replace(/## (.+)/g,'<h2>$1</h2>')
-      .replace(/\*\*(.+?)\*\*/g,'<strong style="color:#e0ecf8">$1</strong>')
-      .replace(/\n/g,'<br>');
-    setHTML('analysis-body', html);
-    el('analysis-body').className = 'analysis-body';
+    // Forecast window: full target day in UTC
+    var localMidnight=new Date(targetDateStr+'T00:00:00.000Z');
+    var fcstStart=new Date(localMidnight.getTime()-tzOff*3600000);
+    var fcstEnd=new Date(fcstStart.getTime()+30*3600000);
+    var fcstStartStr=fcstStart.toISOString().slice(0,19)+'Z';
+    var fcstEndStr=fcstEnd.toISOString().slice(0,19)+'Z';
 
-    // Bet signal — pass full forensic report as context so dashboard syncs with AI output
-    const betPrompt =
-'You are a weather derivatives pricing engine. You just wrote the forensic report below. Extract your own conclusions into JSON. Return ONLY valid JSON, no markdown, no explanation.\n\n' +
-'=== YOUR FORENSIC REPORT (extract numbers from this) ===\n' + text + '\n\n' +
-'=== RAW DATA CONTEXT ===\n' +
-'Station: '+station.name+' ('+station.code+') | '+timeContext+'\n' +
-'WU High: '+(wuHigh&&wuHigh.wethr_high?wuHigh.wethr_high:'?')+'F | NWS: '+(liveHigh&&liveHigh.wethr_high?liveHigh.wethr_high:'?')+'F | MT: '+(mtTemp!=null?mtTemp:'?')+'F\n' +
-'Today NWS: '+(todayFcst&&todayFcst.high?todayFcst.high:'?')+'F | Tomorrow NWS: '+(tomorrowFcst&&tomorrowFcst.high?tomorrowFcst.high:'?')+'F\n' +
-'Models Mean: '+(modelMean||'?')+'F | Spread: '+(modelSpread||'?')+'F\n\n' +
-'CRITICAL: The integerProbs object MUST contain actual percentage numbers (e.g. 25), not 0 or null.\n'
-+ 'Extract from your report above and output ONLY this JSON (numbers must match your report exactly):\n' +
-'{"tomorrowProjectedHigh":integer,"tomorrowRangeLow":integer,"tomorrowRangeHigh":integer,"hardFloor":integer,"hardCeiling":integer,"tomorrowConfidence":integer,"pinRisk":boolean,"integerProbs":{"minus2":number,"minus1":number,"pin":number,"plus1":number,"plus2":number},"trendDirection":"UP|DOWN|FLAT","betSide":"OVER|UNDER|PASS","betEdge":"STRONG|MODERATE|WEAK","betNote":"one sentence max 15 words"}';
+    // Obs window: last 2 hours (same for both)
+    var obsEnd=nowUtc.toISOString().slice(0,19)+'Z';
+    var obsStart=new Date(nowUtc.getTime()-2*3600000).toISOString().slice(0,19)+'Z';
 
-    const br = await fetch('/.netlify/functions/claude', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:600, messages:[{role:'user',content:betPrompt}]})
-    });
-    const bd = await br.json();
-    if(!bd.error && bd.content){
-      const bt = bd.content.map(b=>b.text||'').join('').trim().replace(/```json|```/g,'').trim();
+    try {
+      // Fetch in two 1-hour chunks to maximize HF-METAR 1-min coverage
+      var midTime=new Date(nowUtc.getTime()-1*3600000).toISOString().slice(0,19)+'Z';
+
+      var [r1,r1b,r2,r3,r4]=await Promise.allSettled([
+        fetch(proxyUrl({endpoint:'observations',station_code:station,start_time:midTime,end_time:obsEnd})),
+        fetch(proxyUrl({endpoint:'observations',station_code:station,start_time:obsStart,end_time:midTime})),
+        fetch(proxyUrl({endpoint:'observations',station_code:station,mode:'latest'})),
+        fetch(proxyUrl({endpoint:'observations',station_code:station,mode:'wethr_high',logic:'wu'})),
+        fetch(proxyUrl({endpoint:'forecasts',location_name:station,start_valid_time:fcstStartStr,end_valid_time:fcstEndStr})),
+      ]);
+
+      var history=[],latest=null,wu=null,forecastRows=[],units='fahrenheit';
+
+      // Merge both hourly chunks, deduplicate by observation_time
+      var seenTimes={};
+      function mergeObs(arr){
+        (Array.isArray(arr)?arr:(arr.observations||[])).forEach(function(o){
+          if(!seenTimes[o.observation_time]){
+            seenTimes[o.observation_time]=true;
+            history.push(o);
+          }
+        });
+      }
+      if(r1.status==='fulfilled'&&r1.value.ok){ var d=await r1.value.json(); mergeObs(d); if(history[0]) units=history[0].units||units; }
+      if(r1b.status==='fulfilled'&&r1b.value.ok){ var d2=await r1b.value.json(); mergeObs(d2); }
+      if(r2.status==='fulfilled'&&r2.value.ok){latest=await r2.value.json();units=latest.units||units;}
+      if(r3.status==='fulfilled'&&r3.value.ok) wu=await r3.value.json();
+      if(r4.status==='fulfilled'&&r4.value.ok){
+        var fd=await r4.value.json();
+        forecastRows=Array.isArray(fd)?fd:(fd.forecasts||fd.data||[]);
+      }
+
+      history.sort(function(a,b){return new Date(b.observation_time)-new Date(a.observation_time);});
+      var obs1=history; // all obs combined, sorted newest first
+      var obs5=[];      // unused — kept for clipboard compat
+
+      // Extract WU high/low — handle all possible field names from API v2
+      var wuHigh=null, wuLow=null;
+      if(wu){
+        wuHigh = wu.wethr_high!=null ? wu.wethr_high
+               : wu.wethr_high_f!=null ? wu.wethr_high_f
+               : wu.highest_probable!=null ? wu.highest_probable
+               : null;
+        wuLow  = wu.wethr_low!=null ? wu.wethr_low
+               : wu.wethr_low_f!=null ? wu.wethr_low_f
+               : wu.lowest_probable!=null ? wu.lowest_probable
+               : null;
+        console.log('WU response:', JSON.stringify(wu));
+        console.log('wuHigh:', wuHigh, 'wuLow:', wuLow);
+      }
+      var modelData=processForecasts(forecastRows,station,targetDateStr,nowUtc,wuHigh,wuLow,isTomorrow);
+
+      var store={station,history,latest,wu,units,obs1,obs5,modelData,wuHigh,wuLow,targetDateStr,isTomorrow,at:new Date()};
+
+      if(isTomorrow){
+        storeTmrw=store;
+        // tomorrow pacing panel removed
+        renderModelTable('tbodyModelsTmrw','modelCountTmrw',modelData,true);
+        // obs not shown on tomorrow screen — included in clipboard only
+        document.getElementById('tmrwSection').classList.add('visible');
+      } else {
+        storeToday=store;
+        renderPacing('pacingGridToday',latest,wu,units,false);
+        renderModelTable('tbodyModelsToday','modelCountToday',modelData,false);
+        renderObsTable('tbodyObsToday','countObsToday',history,units);
+        document.getElementById('todaySection').classList.add('visible');
+      }
+
+      // Auto-copy to clipboard immediately
       try {
-        const sig = JSON.parse(bt);
-        const side = sig.betSide || 'PASS';
-        const sideEl = el('bet-side');
-        sideEl.textContent = side;
-        sideEl.className = 'bet-pill ' + side.toLowerCase();
-        const edgeColor = sig.betEdge==='STRONG'?'#00e676':sig.betEdge==='MODERATE'?'var(--gold)':'var(--fire)';
-        el('bet-edge').textContent = sig.betEdge || '—';
-        el('bet-edge').style.color = edgeColor;
-        const trendArrow = sig.trendDirection==='UP'?'▲':sig.trendDirection==='DOWN'?'▼':'▶';
-        const trendColor = sig.trendDirection==='UP'?'#00e676':sig.trendDirection==='DOWN'?'var(--fire)':'var(--gold)';
-        el('bet-trend').textContent = trendArrow + ' ' + (sig.trendDirection||'—');
-        el('bet-trend').style.color = trendColor;
-        const pin = sig.tomorrowProjectedHigh || '—';
-        setText('bet-proj', pin + '°F');
-        // Show range with floor/ceiling if available
-        const floor = sig.hardFloor || sig.tomorrowRangeLow || '—';
-        const ceil = sig.hardCeiling || sig.tomorrowRangeHigh || '—';
-        setText('bet-range', '[' + (sig.tomorrowRangeLow||'—') + '° – ' + (sig.tomorrowRangeHigh||'—') + '°] floor:'+floor+'° ceil:'+ceil+'°');
-        const conf = sig.tomorrowConfidence || 0;
-        setText('bet-conf-text', conf + '% CONFIDENCE' + (sig.pinRisk?' ⚠ PIN RISK':''));
-        // Integer probability mini-bar if available
-        let noteStr = sig.betNote || '';
-        if(sig.integerProbs){
-          const ip = sig.integerProbs;
-          const pinInt = parseInt(pin);
-          noteStr += ' | Probs: '+(pinInt-2)+'°:'+Math.round(ip.minus2||0)+'% '+(pinInt-1)+'°:'+Math.round(ip.minus1||0)+'% '+pinInt+'°:'+Math.round(ip.pin||0)+'% '+(pinInt+1)+'°:'+Math.round(ip.plus1||0)+'% '+(pinInt+2)+'°:'+Math.round(ip.plus2||0)+'%';
+        var clipText = buildClipboard(store);
+        if(navigator.clipboard&&navigator.clipboard.writeText){
+          navigator.clipboard.writeText(clipText).then(function(){
+            setStatus('✓ '+(isTomorrow?"Tomorrow":"Today")+': '+history.length+' obs, '+modelData.length+' models — copied to clipboard!','success');
+          }).catch(function(){
+            fallbackCopy(clipText);
+            setStatus('✓ '+(isTomorrow?"Tomorrow":"Today")+': '+history.length+' obs, '+modelData.length+' models — copied to clipboard!','success');
+          });
+        } else {
+          fallbackCopy(clipText);
+          setStatus('✓ '+(isTomorrow?"Tomorrow":"Today")+': '+history.length+' obs, '+modelData.length+' models — copied to clipboard!','success');
         }
-        setText('bet-note', noteStr);
-        const confColor = conf>=70?'#00e676':conf>=45?'var(--gold)':'var(--fire)';
-        el('bet-conf-fill').style.width = conf + '%';
-        el('bet-conf-fill').style.background = confColor;
-        show('bet-banner');
+      } catch(e){
+        setStatus('✓ '+(isTomorrow?"Tomorrow":"Today")+': '+history.length+' obs, '+modelData.length+' models for '+station,'success');
+      }
 
-        // Render integer probability dashboard
-        if(sig.integerProbs && sig.tomorrowProjectedHigh){
-          const pin = sig.tomorrowProjectedHigh;
-          const ip = sig.integerProbs;
-          // Build tomorrow probs array from JSON
-          const tmrwProbs = [
-            {t: pin-2, p: Math.round(ip.minus2||0)},
-            {t: pin-1, p: Math.round(ip.minus1||0)},
-            {t: pin,   p: Math.round(ip.pin||0)},
-            {t: pin+1, p: Math.round(ip.plus1||0)},
-            {t: pin+2, p: Math.round(ip.plus2||0)},
-          ];
-          const maxTmrw = Math.max(...tmrwProbs.map(r=>r.p));
-          el('prob-tmrw-pin').textContent = 'PIN: ' + pin + '°F | Range: ' + (sig.tomorrowRangeLow||'?') + '°–' + (sig.tomorrowRangeHigh||'?') + '°F';
-          el('prob-tmrw-bars').innerHTML = tmrwProbs.map(row => {
-            const isPin = row.t === pin;
-            const barColor = isPin ? 'var(--gold)' : row.p > 20 ? 'var(--acid)' : 'var(--mut)';
-            const widthPct = maxTmrw > 0 ? Math.round(row.p / maxTmrw * 100) : 0;
-            return '<div class="prob-row">' +
-              '<div class="prob-temp" style="color:' + (isPin?'var(--gold)':'#fff') + '">' + row.t + '°</div>' +
-              '<div class="prob-bar-wrap"><div class="prob-bar-fill" style="width:' + widthPct + '%;background:' + barColor + '"></div></div>' +
-              '<div class="prob-pct" style="color:#4da6ff">' + row.p + '%</div>' +
-            '</div>';
-          }).join('');
-
-          // Today probs: derive from today NWS high + live running high
-          const todayHigh = (wuHigh&&wuHigh.wethr_high) || (liveHigh&&liveHigh.wethr_high);
-          const todayNWS = todayFcst && todayFcst.high;
-          if(todayHigh || todayNWS){
-            const todayPin = todayHigh || todayNWS;
-            el('prob-today-pin').textContent = 'Running: ' + (todayHigh||'?') + '°F | NWS: ' + (todayNWS||'?') + '°F';
-            // Simple probability distribution centered on running high
-            const todayProbs = [
-              {t: todayPin-1, p: 8},
-              {t: todayPin,   p: 55},
-              {t: todayPin+1, p: 30},
-              {t: todayPin+2, p: 7},
-            ];
-            const maxToday = 55;
-            el('prob-today-bars').innerHTML = todayProbs.map(row => {
-              const isPin = row.t === todayPin;
-              const barColor = isPin ? 'var(--fire)' : row.p > 20 ? '#ff8866' : 'var(--mut)';
-              const widthPct = Math.round(row.p / maxToday * 100);
-              return '<div class="prob-row">' +
-                '<div class="prob-temp" style="color:' + (isPin?'var(--fire)':'#fff') + '">' + row.t + '°</div>' +
-                '<div class="prob-bar-wrap"><div class="prob-bar-fill" style="width:' + widthPct + '%;background:' + barColor + '"></div></div>' +
-                '<div class="prob-pct" style="color:#4da6ff">' + row.p + '%</div>' +
-              '</div>';
-            }).join('');
-          }
-
-          if(sig.pinRisk){
-            show('prob-pin-risk');
-          }
-          show('prob-panel');
-        }
-      } catch(e){ console.warn('bet parse error:', e.message); }
+    } catch(err){
+      setStatus('✗ '+err.message,'error');
     }
-  } catch(err){
-    console.error('AI error:', err);
-    setHTML('analysis-body', 'AI analysis unavailable: ' + (err.message || JSON.stringify(err)));
-    el('analysis-body').className = 'analysis-body';
-  }
-}
 
-// INIT
-buildStationList('');
-// loadData() is called by gate after auth;
-// setInterval(loadData, 5*60*1000); // Auto-refresh off by default — use REFRESH button to control costs
+    btn.disabled=false; btn.classList.remove('loading');
+    btn.querySelector('.btn-text').textContent=isTomorrow?'🔭 Tomorrow\'s Data':'📅 Today\'s Data';
+  }
+
+  function renderPacing(gridId,latest,wu,units,isTomorrow){
+    var u=units==='fahrenheit'?'deg F':'deg C';
+    var items;
+    if(isTomorrow){
+      items=[
+        {label:'WU Wethr High', value:wu&&wu.wethr_high!=null?wu.wethr_high+(units==='fahrenheit'?'\u00b0F':'\u00b0C'):'N/A'},
+        {label:'WU Wethr Low',  value:wu&&wu.wethr_low!=null?wu.wethr_low+(units==='fahrenheit'?'\u00b0F':'\u00b0C'):'N/A'},
+        {label:'Rel. Humidity', value:latest&&latest.relative_humidity!=null?latest.relative_humidity+'%':'N/A'},
+      ];
+    } else {
+      var cur=latest?(latest.temperature_display!=null?latest.temperature_display:latest.temperature_f):null;
+      var uu=units==='fahrenheit'?'\u00b0F':'\u00b0C';
+      items=[
+        {label:'Current Temp',  value:cur!=null?cur+uu:'N/A'},
+        {label:'Rel. Humidity', value:latest&&latest.relative_humidity!=null?latest.relative_humidity+'%':'N/A'},
+        {label:'DSM High',      value:latest&&(latest.dsm_high_display!=null||latest.dsm_high_f!=null)?(latest.dsm_high_display!=null?latest.dsm_high_display:latest.dsm_high_f)+uu:'N/A'},
+        {label:'WU Wethr High', value:wu&&wu.wethr_high!=null?wu.wethr_high+uu:'N/A'},
+        {label:'WU Wethr Low',  value:wu&&wu.wethr_low!=null?wu.wethr_low+uu:'N/A'},
+        {label:'Last Obs (UTC)',value:latest?formatTime(latest.observation_time):'N/A'},
+      ];
+    }
+    document.getElementById(gridId).innerHTML=items.map(function(i){
+      return '<div class="pacing-item"><div class="pacing-label">'+i.label+'</div>'
+            +'<div class="pacing-value'+(i.value==='N/A'?' na':'')+'">'+i.value+'</div></div>';
+    }).join('');
+  }
+
+  function renderModelTable(tbodyId,countId,modelData,isTmrw){
+    document.getElementById(countId).textContent=modelData.length+' models';
+    if(!modelData.length){
+      var cols=6;
+      document.getElementById(tbodyId).innerHTML='<tr><td colspan="'+cols+'" style="color:var(--muted);padding:12px 0;font-family:\'JetBrains Mono\',monospace;font-size:0.75rem;">No forecast data available</td></tr>';
+      return;
+    }
+    if(isTmrw){
+      // Tomorrow: full 6 columns same as today
+      document.getElementById(tbodyId).innerHTML=modelData.map(function(m){
+        return '<tr>'
+          +'<td class="m-name tmrw">'+m.model+'</td>'
+          +'<td class="m-high">'+(m.forecastHigh!=null?m.forecastHigh+'°F':'—')+'</td>'
+          +'<td class="m-time">'+m.highTimeLocal+'</td>'
+          +'<td style="color:var(--text)">'+(m.pacingHigh!=null?m.pacingHigh+'°F':'—')+'</td>'
+          +'<td style="color:var(--muted)">'+m.wuRange+'</td>'
+          +'<td class="'+m.deltaClass+'">'+m.delta+'</td>'
+          +'</tr>';
+      }).join('');
+    } else {
+      document.getElementById(tbodyId).innerHTML=modelData.map(function(m){
+        return '<tr>'
+          +'<td class="m-name">'+m.model+'</td>'
+          +'<td class="m-high">'+(m.forecastHigh!=null?m.forecastHigh+'°F':'—')+'</td>'
+          +'<td class="m-time">'+m.highTimeLocal+'</td>'
+          +'<td style="color:var(--text)">'+(m.pacingHigh!=null?m.pacingHigh+'°F':'—')+'</td>'
+          +'<td style="color:var(--muted)">'+m.wuRange+'</td>'
+          +'<td class="'+m.deltaClass+'">'+m.delta+'</td>'
+          +'</tr>';
+      }).join('');
+    }
+  }
+
+  function renderObsTable(tbodyId,countId,obs,units){
+    document.getElementById(countId).textContent=obs.length+' records';
+    document.getElementById(tbodyId).innerHTML=obs.length
+      ?obs.map(function(o){return buildObsRow(o,units);}).join('')
+      :'<tr><td colspan="6" style="color:var(--muted);padding:12px 0;font-family:\'JetBrains Mono\',monospace;font-size:0.75rem;">No observations in this window</td></tr>';
+  }
+
+  function pad(s,n){return String(s).padEnd(n);}
+
+  function buildClipboard(store){
+    var lines=[];
+    var u=store.units==='fahrenheit'?'°F':'°C';
+
+    function modelSection(label, data){
+      lines.push('--- '+label+' ('+data.length+' models) ---');
+      lines.push(pad('Model',22)+' '+pad('Fcst High',10)+' '+pad('High Time',12)+' '+pad('Pacing',10)+' '+pad('Actual (WU)',13)+' Pace');
+      lines.push('-'.repeat(85));
+      data.forEach(function(m){
+        lines.push(pad(m.model,22)+' '+pad(m.forecastHigh!=null?m.forecastHigh+'°F':'—',10)+' '+pad(m.highTimeLocal,12)+' '+pad(m.pacingHigh!=null?m.pacingHigh+'°F':'—',10)+' '+pad(m.wuRange,13)+' '+m.delta);
+      });
+      lines.push('');
+    }
+
+    function obsSection(label, history, units){
+      lines.push('--- '+label+' ('+history.length+' records) ---');
+      lines.push(pad('Time (UTC)',22)+' '+pad('Temp',8)+' '+pad('Dew Pt',8)+' '+pad('RH%',5)+' '+pad('Wind',18)+' Type');
+      lines.push('-'.repeat(80));
+      history.forEach(function(o){
+        var t=o.product||guessType(o);
+        lines.push(pad(formatTime(o.observation_time),22)+' '+pad(formatTemp(o,units),8)+' '+pad(formatDew(o,units),8)+' '+pad(o.relative_humidity!=null?o.relative_humidity+'%':'—',5)+' '+pad(formatWind(o),18)+' '+t);
+      });
+      lines.push('');
+    }
+
+    if(!store.isTomorrow){
+      // ── TODAY ──────────────────────────────────────────────────────
+      lines.push("Here is the "+store.station+" Tape from today, run the prompt to find where we top out.");
+      lines.push('');
+      lines.push('Station : '+store.station+'   Fetched : '+store.at.toUTCString());
+      lines.push('');
+
+      // Current conditions
+      lines.push('--- CURRENT CONDITIONS & PACING ---');
+      if(store.latest){
+        var cur=store.latest.temperature_display!=null?store.latest.temperature_display:store.latest.temperature_f;
+        lines.push('Current Temperature : '+(cur!=null?cur+u:'N/A'));
+        lines.push('Relative Humidity   : '+(store.latest.relative_humidity!=null?store.latest.relative_humidity+'%':'N/A'));
+        var dsmH=store.latest.dsm_high_display!=null?store.latest.dsm_high_display:store.latest.dsm_high_f;
+        if(dsmH!=null) lines.push('DSM High            : '+dsmH+u);
+        lines.push('Last Obs Time (UTC) : '+(store.latest.observation_time||'N/A'));
+      }
+      if(store.wu){
+        lines.push('WU Wethr High : '+store.wu.wethr_high+u+'  @ '+(store.wu.time_of_high_utc||'N/A'));
+        lines.push('WU Wethr Low  : '+store.wu.wethr_low+u+'  @ '+(store.wu.time_of_low_utc||'N/A'));
+      }
+      lines.push('');
+
+      // Today model pacing
+      modelSection('TODAY MODEL FORECAST PACING', store.modelData);
+
+      // Obs last 2hrs
+      obsSection('ALL OBSERVATIONS — LAST 2 HRS (5min / Hourly)', store.history, store.units);
+
+    } else {
+      // ── TOMORROW ───────────────────────────────────────────────────
+      lines.push("Tomorrow's projection data, pacing from today. calibrate model integrity to our prompt and nail the exact future high tomorrow at "+store.station);
+      lines.push('');
+      lines.push('Station : '+store.station+'   Fetched : '+store.at.toUTCString());
+      lines.push('');
+
+      // Obs last 2hrs FIRST
+      obsSection('ALL OBSERVATIONS — LAST 2 HRS (5min / Hourly)', store.history, store.units);
+
+      // Today model pacing (if available)
+      if(storeToday && storeToday.modelData && storeToday.modelData.length){
+        modelSection('TODAY MODEL FORECAST PACING', storeToday.modelData);
+      }
+
+      // Tomorrow model pacing
+      modelSection('TOMORROW MODEL FORECAST PACING', store.modelData);
+    }
+
+    lines.push('=== END OF SNAPSHOT ===');
+    return lines.join('\n');
+  }
+
+  function copyToClipboard(day){
+    var isTomorrow=day==='tomorrow';
+    var store=isTomorrow?storeTmrw:storeToday;
+    if(!store) return;
+    var text=buildClipboard(store);
+    var btnId=isTomorrow?'copyTmrwBtn':'copyTodayBtn';
+    var txtId=isTomorrow?'copyTmrwText':'copyTodayText';
+    var origLabel=isTomorrow?"📋 Re-copy to Clipboard":"📋 Re-copy to Clipboard";
+
+    function onCopied(){
+      var b=document.getElementById(btnId),t=document.getElementById(txtId);
+      b.classList.add('copied'); t.textContent='✓ Copied to Clipboard!';
+      setTimeout(function(){b.classList.remove('copied');t.textContent=origLabel;},2500);
+    }
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(onCopied).catch(function(){fallbackCopy(text);onCopied();});
+    } else {fallbackCopy(text);onCopied();}
+  }
+
+  function fallbackCopy(text){
+    var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.focus();ta.select();document.execCommand('copy');document.body.removeChild(ta);
+  }
 </script>
 </body>
 </html>
+
 
