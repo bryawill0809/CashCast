@@ -390,6 +390,7 @@
     var tzOff=TZ_OFFSETS[station]||-5;
     var nowUtc=new Date();
     var targetDateStr=getLocalDateStr(nowUtc,tzOff,isTomorrow?1:0);
+    console.log('fetchDay:', day, station, 'targetDate:', targetDateStr);
 
     // Forecast window: full target day in UTC
     var localMidnight=new Date(targetDateStr+'T00:00:00.000Z');
@@ -480,7 +481,8 @@
       }
 
     } catch(err){
-      setStatus('✗ '+err.message,'error');
+      console.error('fetchDay error:', err);
+      setStatus('✗ '+err.message+' (check console for details)','error');
     }
 
     btn.disabled=false; btn.classList.remove('loading');
