@@ -403,31 +403,21 @@
     var obsStart=new Date(nowUtc.getTime()-2*3600000).toISOString().slice(0,19)+'Z';
 
     try {
-      // Fetch in two 1-hour chunks to maximize HF-METAR 1-min coverage
-      var midTime=new Date(nowUtc.getTime()-1*3600000).toISOString().slice(0,19)+'Z';
-
-      var [r1,r1b,r2,r3,r4]=await Promise.allSettled([
-        fetch(proxyUrl({endpoint:'observations',station_code:station,start_time:midTime,end_time:obsEnd})),
-        fetch(proxyUrl({endpoint:'observations',station_code:station,start_time:obsStart,end_time:midTime})),
+      var results=await Promise.allSettled([
+        fetch(proxyUrl({endpoint:'observations',station_code:station,start_time:obsStart,end_time:obsEnd})),
         fetch(proxyUrl({endpoint:'observations',station_code:station,mode:'latest'})),
         fetch(proxyUrl({endpoint:'observations',station_code:station,mode:'wethr_high',logic:'wu'})),
         fetch(proxyUrl({endpoint:'forecasts',location_name:station,start_valid_time:fcstStartStr,end_valid_time:fcstEndStr})),
       ]);
+      var r1=results[0],r2=results[1],r3=results[2],r4=results[3];
 
       var history=[],latest=null,wu=null,forecastRows=[],units='fahrenheit';
 
-      // Merge both hourly chunks, deduplicate by observation_time
-      var seenTimes={};
-      function mergeObs(arr){
-        (Array.isArray(arr)?arr:(arr.observations||[])).forEach(function(o){
-          if(!seenTimes[o.observation_time]){
-            seenTimes[o.observation_time]=true;
-            history.push(o);
-          }
-        });
+      if(r1.status==='fulfilled'&&r1.value.ok){
+        var d=await r1.value.json();
+        history=Array.isArray(d)?d:(d.observations||[]);
+        if(history[0]) units=history[0].units||units;
       }
-      if(r1.status==='fulfilled'&&r1.value.ok){ var d=await r1.value.json(); mergeObs(d); if(history[0]) units=history[0].units||units; }
-      if(r1b.status==='fulfilled'&&r1b.value.ok){ var d2=await r1b.value.json(); mergeObs(d2); }
       if(r2.status==='fulfilled'&&r2.value.ok){latest=await r2.value.json();units=latest.units||units;}
       if(r3.status==='fulfilled'&&r3.value.ok) wu=await r3.value.json();
       if(r4.status==='fulfilled'&&r4.value.ok){
@@ -669,5 +659,6 @@
 </script>
 </body>
 </html>
+
 
 
